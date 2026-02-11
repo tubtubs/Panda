@@ -1,165 +1,165 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-	<Script file="Panda.lua"/>
+    <Script file="Panda.lua"/>
     <Button name="PandaBorderButtonTemplate" virtual="true">
         <Size>
             <AbsDimension x="115" y="32"/>
         </Size>
         <Layers>
-        	<Layer level="BACKGROUND">
-        		<Texture name="$parentLeftDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
-        			<Size>
-        				<AbsDimension x="20" y="32"/>
-        			</Size>
-        			<Anchors>
-        				<Anchor point="TOPLEFT">
-        					<Offset>
-        						<AbsDimension x="0" y="5"/>
-        					</Offset>
-        				</Anchor>
-        			</Anchors>
-					<TexCoords left="0" right="0.15625" top="0" bottom="1.0"/>
-        		</Texture>
-				<Texture name="$parentMiddleDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
-        			<Size>
-        				<AbsDimension x="88" y="32"/>
-        			</Size>
-        			<Anchors>
-        				<Anchor point="LEFT" relativeTo="$parentLeftDisabled" relativePoint="RIGHT"/>
-        			</Anchors>
-					<TexCoords left="0.15625" right="0.84375" top="0" bottom="1.0"/>
-        		</Texture>
-				<Texture name="$parentRightDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
-        			<Size>
-        				<AbsDimension x="20" y="32"/>
-        			</Size>
-        			<Anchors>
-        				<Anchor point="LEFT" relativeTo="$parentMiddleDisabled" relativePoint="RIGHT"/>
-        			</Anchors>
-					<TexCoords left="0.84375" right="1.0" top="0" bottom="1.0"/>
-        		</Texture>
-				<Texture name="$parentLeft" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
-        			<Size>
-        				<AbsDimension x="20" y="32"/>
-        			</Size>
-        			<Anchors>
-        				<Anchor point="TOPLEFT"/>
-        			</Anchors>
-					<TexCoords left="0" right="0.15625" top="0" bottom="1.0"/>
-        		</Texture>
-				<Texture name="$parentMiddle" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
-        			<Size>
-        				<AbsDimension x="88" y="32"/>
-        			</Size>
-        			<Anchors>
-        				<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
-					</Anchors>
-					<TexCoords left="0.15625" right="0.84375" top="0" bottom="1.0"/>
-        		</Texture>
-				<Texture name="$parentRight" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
-        			<Size>
-        				<AbsDimension x="20" y="32"/>
-        			</Size>
-        			<Anchors>
-        				<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
-        			</Anchors>
-					<TexCoords left="0.84375" right="1.0" top="0" bottom="1.0"/>
-        		</Texture>
-        	</Layer>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentLeftDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+                    <Size>
+                        <AbsDimension x="20" y="32"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="0" y="5"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <TexCoords left="0" right="0.15625" top="0" bottom="1.0"/>
+                </Texture>
+                <Texture name="$parentMiddleDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+                    <Size>
+                        <AbsDimension x="88" y="32"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentLeftDisabled" relativePoint="RIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0.15625" right="0.84375" top="0" bottom="1.0"/>
+                </Texture>
+                <Texture name="$parentRightDisabled" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+                    <Size>
+                        <AbsDimension x="20" y="32"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentMiddleDisabled" relativePoint="RIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0.84375" right="1.0" top="0" bottom="1.0"/>
+                </Texture>
+                <Texture name="$parentLeft" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+                    <Size>
+                        <AbsDimension x="20" y="32"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                    </Anchors>
+                    <TexCoords left="0" right="0.15625" top="0" bottom="1.0"/>
+                </Texture>
+                <Texture name="$parentMiddle" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+                    <Size>
+                        <AbsDimension x="88" y="32"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0.15625" right="0.84375" top="0" bottom="1.0"/>
+                </Texture>
+                <Texture name="$parentRight" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+                    <Size>
+                        <AbsDimension x="20" y="32"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0.84375" right="1.0" top="0" bottom="1.0"/>
+                </Texture>
+            </Layer>
         </Layers>
-		<Scripts>
-			<OnLoad>
+        <Scripts>
+            <OnLoad>
 				this:SetFrameLevel(this:GetFrameLevel() + 4);
 			</OnLoad>
-			<OnClick>
+            <OnClick>
 				PanelTemplates_Tab_OnClick(PandaBorder);
                 PandaBorderButton_OnClick()
 			</OnClick>
-			<OnShow>
+            <OnShow>
                 PanelTemplates_TabResize(0);
 				getglobal(this:GetName().."HighlightTexture"):SetWidth(this:GetTextWidth() + 30);
 			</OnShow>
         </Scripts>
-		<ButtonText name="$parentText">
-			<Anchors>
-				<Anchor point="CENTER">
-					<Offset>
-						<AbsDimension x="0" y="2"/>
-					</Offset>
-				</Anchor>
-			</Anchors>
-		</ButtonText>
-		<NormalFont inherits="GameFontNormalSmall"/>
-		<HighlightFont inherits="GameFontHighlightSmall"/>
-		<DisabledFont inherits="GameFontHighlightSmall"/>
-		<HighlightTexture name="$parentHighlightTexture" file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight" alphaMode="ADD">
-			<Anchors>
-				<Anchor point="LEFT">
-					<Offset>
-						<AbsDimension x="10" y="2"/>
-					</Offset>
-				</Anchor>
-				<Anchor point="RIGHT">
-					<Offset>
-						<AbsDimension x="-10" y="2"/>
-					</Offset>
-				</Anchor>
-			</Anchors>
-		</HighlightTexture>
+        <ButtonText name="$parentText">
+            <Anchors>
+                <Anchor point="CENTER">
+                    <Offset>
+                        <AbsDimension x="0" y="2"/>
+                    </Offset>
+                </Anchor>
+            </Anchors>
+        </ButtonText>
+        <NormalFont inherits="GameFontNormalSmall"/>
+        <HighlightFont inherits="GameFontHighlightSmall"/>
+        <DisabledFont inherits="GameFontHighlightSmall"/>
+        <HighlightTexture name="$parentHighlightTexture" file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight" alphaMode="ADD">
+            <Anchors>
+                <Anchor point="LEFT">
+                    <Offset>
+                        <AbsDimension x="10" y="2"/>
+                    </Offset>
+                </Anchor>
+                <Anchor point="RIGHT">
+                    <Offset>
+                        <AbsDimension x="-10" y="2"/>
+                    </Offset>
+                </Anchor>
+            </Anchors>
+        </HighlightTexture>
     </Button>
     <Button name="PandaDEButtonTemplate" virtual="true">
-		<Size>
-			<AbsDimension x="36" y="36"/>
-		</Size>
-		<Layers>
-			<Layer level="OVERLAY">
-				<FontString name="$parentName" inherits="GameFontHighlightSmallOutline">
-					<Size>
-						<AbsDimension x="36" y="10"/>
-					</Size>
-					<Anchors>
-						<Anchor point="BOTTOM">
-							<Offset>
-								<AbsDimension x="0" y="2"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-			<Layer level="BACKGROUND">
-				<Texture file="Interface\Buttons\UI-EmptySlot-Disabled">
-					<Size>
-						<AbsDimension x="64" y="64"/>
-					</Size>
-					<Anchors>
-						<Anchor point="CENTER">
-							<Offset>
-								<AbsDimension x="0" y="-1"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<NormalTexture name="$parentIcon">
-			<Size>
-				<AbsDimension x="36" y="36"/>
-			</Size>
-			<Anchors>
-				<Anchor point="CENTER">
-					<Offset>
-						<AbsDimension x="0" y="-1"/>
-					</Offset>
-				</Anchor>
-			</Anchors>
-		</NormalTexture>
-		<HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
-		<Scripts>
-			<OnClick>
+        <Size>
+            <AbsDimension x="36" y="36"/>
+        </Size>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="$parentName" inherits="GameFontHighlightSmallOutline" text="Thunderfury, Blessed Blade of the Windseeker">
+                    <Size>
+                        <AbsDimension x="356" y="10"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="146" y="2"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="BACKGROUND">
+                <Texture file="Interface\Buttons\UI-EmptySlot-Disabled">
+                    <Size>
+                        <AbsDimension x="64" y="64"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="-1"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <NormalTexture name="$parentIcon" file="Interface\Icons\inv_sword_39">
+            <Size>
+                <AbsDimension x="36" y="36"/>
+            </Size>
+            <Anchors>
+                <Anchor point="CENTER">
+                    <Offset>
+                        <AbsDimension x="0" y="-1"/>
+                    </Offset>
+                </Anchor>
+            </Anchors>
+        </NormalTexture>
+        <HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+        <Scripts>
+            <OnClick>
                 PandaDEButton_OnClick()
 			</OnClick>
-		</Scripts>
-	</Button>
+        </Scripts>
+    </Button>
     <Frame name="PandaBorder" toplevel="true" movable="true" parent="UIParent" hidden="true">
         <Size>
             <AbsDimension x="384" y="512"/>
@@ -171,9 +171,9 @@
                 </Offset>
             </Anchor>
         </Anchors>
-		<HitRectInsets>
-			<AbsInset left="0" right="30" top="0" bottom="45"/>
-		</HitRectInsets>
+        <HitRectInsets>
+            <AbsInset left="0" right="30" top="0" bottom="45"/>
+        </HitRectInsets>
         <Layers>
             <Layer level="ARTWORK">
                 <Texture name="$parentPortrait" file="Interface\Addons\Panda\Assets\Panda.blp">
@@ -195,7 +195,7 @@
                 <Size>
                     <AbsDimension x="109" y="12"/>
                 </Size>
-                 <Anchors>
+                <Anchors>
                     <Anchor point="CENTER">
                         <Offset>
                             <AbsDimension x="6" y="232"/>
@@ -216,7 +216,7 @@
                     </Layer>
                 </Layers>
                 <Scripts>
-                     <OnLoad>
+                    <OnLoad>
                         this:SetFrameLevel(this:GetFrameLevel() + 1);
                     </OnLoad>
                 </Scripts>
@@ -243,216 +243,385 @@
                         </Offset>
                     </Anchor>
                 </Anchors>
-                <Scripts>
-					<OnEnter>
-						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-						GameTooltip:SetText(MicroButtonTooltipText(TEXT(CHARACTER_INFO), "TOGGLECHARACTER0"), 1.0,1.0,1.0 );
-					</OnEnter>
-					<OnLeave>
-						GameTooltip:Hide();
-					</OnLeave>
-                </Scripts>
             </Button>
             <Button name="$parentTab2" inherits="PandaBorderButtonTemplate" id="2" text="PA_CAT2">
                 <Anchors>
-                   <Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
+                    <Anchor point="LEFT" relativeTo="$parentTab1" relativePoint="RIGHT">
                         <Offset>
                             <AbsDimension x="-16" y="0"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
-                <Scripts>
-					<OnEnter>
-						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-						GameTooltip:SetText(MicroButtonTooltipText(TEXT(PET), "TOGGLECHARACTER3"), 1.0,1.0,1.0 );
-					</OnEnter>
-					<OnLeave>
-						GameTooltip:Hide();
-					</OnLeave>
-                </Scripts>
             </Button>
         </Frames>
         <Scripts>
-			<OnLoad>
+            <OnLoad>
                 PandaBorder_OnLoad()
 			</OnLoad>
             <OnEvent>
             </OnEvent>
             <OnShow>
             </OnShow>
-			<OnHide>
+            <OnHide>
 			</OnHide>
+            <OnEvent>
+            </OnEvent>
         </Scripts>
     </Frame>
-	<Frame name="PandaDEFrame" setAllPoints="true" enableMouse="true" parent="PandaBorder" hidden="true" id="1">
-		<HitRectInsets>
-			<AbsInset left="0" right="30" top="0" bottom="75"/>
-		</HitRectInsets>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopLeft">
-					<Size>
-						<AbsDimension x="256" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="2" y="-1"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopRight">
-					<Size>
-						<AbsDimension x="128" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="258" y="-1"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomLeft">
-					<Size>
-						<AbsDimension x="256" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="2" y="-257"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomRight">
-					<Size>
-						<AbsDimension x="128" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="258" y="-257"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
+    <Frame name="PandaDEFrame" setAllPoints="true" enableMouse="true" parent="PandaBorder" hidden="true" id="1">
+        <HitRectInsets>
+            <AbsInset left="0" right="30" top="0" bottom="75"/>
+        </HitRectInsets>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopLeft">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="2" y="-1"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopRight">
+                    <Size>
+                        <AbsDimension x="128" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="258" y="-1"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomLeft">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="2" y="-257"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomRight">
+                    <Size>
+                        <AbsDimension x="128" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="258" y="-257"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
 			</Layer>
-			<Layer level="ARTWORK">
-			</Layer>
-			<Layer level="OVERLAY">
-				<Texture name="HonorFramePvPIcon">
-					<Size>
-						<AbsDimension x="24" y="24"/>
-					</Size>
-					<Anchors>
-						<Anchor point="RIGHT" relativeTo="HonorFrameCurrentPVPTitle" relativePoint="LEFT">
-							<Offset>
-								<AbsDimension x="-5" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<Frames>
+            <Layer level="OVERLAY">
+                <!--
+                <FontString name="$parentBOPFilterTip" inherits="GameFontHighlightSmallOutline" text="Filter out Bind on Pickup items">
+                    <Size>
+                        <AbsDimension x="180" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="50" y="-370"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentBlackListFilterTip" inherits="GameFontHighlightSmallOutline" text="Filter out Blacklisted Items">
+                    <Size>
+                        <AbsDimension x="180" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="40" y="-400"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentQualityFilterTip" inherits="GameFontHighlightSmallOutline" text="Quality threshold:">
+                    <Size>
+                        <AbsDimension x="180" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="190" y="-370"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                -->
+            </Layer>
+        </Layers>
+        <Frames>
+            <Button name="$parentDEButton1" inherits="PandaDEButtonTemplate" id="1">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="30" y="-84"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentDEButton2" inherits="PandaDEButtonTemplate" id="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton1">
+                        <Offset>
+                            <AbsDimension x="0" y="-48"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentDEButton3" inherits="PandaDEButtonTemplate" id="3">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton2">
+                        <Offset>
+                            <AbsDimension x="0" y="-48"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentDEButton4" inherits="PandaDEButtonTemplate" id="4">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton3">
+                        <Offset>
+                            <AbsDimension x="0" y="-48"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentDEButton5" inherits="PandaDEButtonTemplate" id="5">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton4">
+                        <Offset>
+                            <AbsDimension x="0" y="-48"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentDEButton6" inherits="PandaDEButtonTemplate" id="6">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton5">
+                        <Offset>
+                            <AbsDimension x="0" y="-48"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <CheckButton name="$parentBOPFilterCheckButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton6">
+                        <Offset>
+                            <AbsDimension x="0" y="-44"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="Filter out Bind on Pickup items">
+                            <Size>
+                                <AbsDimension x="200" y="10"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="CENTER">
+                                    <Offset>
+                                        <AbsDimension x="115" y="2"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+					</OnClick>
+                    <OnEnter>
+					GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
+					GameTooltip:SetText("");
+					GameTooltip:Show();
+					</OnEnter>
+                    <OnLeave>
+					GameTooltip:Hide();
+					</OnLeave>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentBlacklistFilterCheckButton" inherits="OptionsCheckButtonTemplate" checked="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentBOPFilterCheckButton">
+                        <Offset>
+                            <AbsDimension x="0" y="-28"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="Filter out Blacklisted Items">
+                            <Size>
+                                <AbsDimension x="200" y="10"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="CENTER">
+                                    <Offset>
+                                        <AbsDimension x="115" y="2"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+					</OnClick>
+                    <OnEnter>
+					GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
+					GameTooltip:SetText("");
+					GameTooltip:Show();
+					</OnEnter>
+                    <OnLeave>
+					GameTooltip:Hide();
+					</OnLeave>
+                </Scripts>
+            </CheckButton>
+            <Frame name="$parentQualityThresholdDropdown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentBOPFilterCheckButton">
+                        <Offset>
+                            <AbsDimension x="180" y="-28"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <FontString name="$parentLabel" inherits="GameFontHighlightSmallOutline" text="Quality threshold:">
+                            <Anchors>
+                                <Anchor point="CENTER" relativePoint="TOP">
+                                    <Offset>
+                                        <AbsDimension x="0" y="9"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnLoad>
+                        PandaDEFrameQualityThresholdDropdown_OnLoad();
+                    </OnLoad>
+                    <OnEnter>
 
-		</Frames>
-		<Scripts>
+                    </OnEnter>
+                    <OnLeave>
+                    </OnLeave>
+                </Scripts>
+            </Frame>
+        </Frames>
+        <Scripts>
             <OnShow>
                 PandaPanel_OnShow()
                 PandaDEFrame_OnShow()
             </OnShow>
-			<OnLoad>
+            <OnLoad>
 			</OnLoad>
-			<OnEvent>
+            <OnEvent>
 			</OnEvent>
-		</Scripts>
-	</Frame>
+        </Scripts>
+    </Frame>
     <Frame name="PandaOptionsFrame" setAllPoints="true" enableMouse="true" parent="PandaBorder" hidden="true" id="2">
-		<HitRectInsets>
-			<AbsInset left="0" right="30" top="0" bottom="75"/>
-		</HitRectInsets>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopLeft">
-					<Size>
-						<AbsDimension x="256" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="2" y="-1"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopRight">
-					<Size>
-						<AbsDimension x="128" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="258" y="-1"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomLeft">
-					<Size>
-						<AbsDimension x="256" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="2" y="-257"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomRight">
-					<Size>
-						<AbsDimension x="128" y="256"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="258" y="-257"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
+        <HitRectInsets>
+            <AbsInset left="0" right="30" top="0" bottom="75"/>
+        </HitRectInsets>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopLeft">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="2" y="-1"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-TopRight">
+                    <Size>
+                        <AbsDimension x="128" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="258" y="-1"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomLeft">
+                    <Size>
+                        <AbsDimension x="256" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="2" y="-257"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture file="Interface\PaperDollInfoFrame\UI-Character-General-BottomRight">
+                    <Size>
+                        <AbsDimension x="128" y="256"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="258" y="-257"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
 			</Layer>
-			<Layer level="ARTWORK">
-			</Layer>
-			<Layer level="OVERLAY">
-				<Texture name="HonorFramePvPIcon">
-					<Size>
-						<AbsDimension x="24" y="24"/>
-					</Size>
-					<Anchors>
-						<Anchor point="RIGHT" relativeTo="HonorFrameCurrentPVPTitle" relativePoint="LEFT">
-							<Offset>
-								<AbsDimension x="-5" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<Frames>
+            <Layer level="OVERLAY">
+                <Texture name="HonorFramePvPIcon">
+                    <Size>
+                        <AbsDimension x="24" y="24"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeTo="HonorFrameCurrentPVPTitle" relativePoint="LEFT">
+                            <Offset>
+                                <AbsDimension x="-5" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Frames>
 
 		</Frames>
-		<Scripts>
+        <Scripts>
             <OnShow>
                 PandaPanel_OnShow()
             </OnShow>
-			<OnLoad>
+            <OnLoad>
 			</OnLoad>
-			<OnEvent>
+            <OnEvent>
 			</OnEvent>
-		</Scripts>
-	</Frame>
+        </Scripts>
+    </Frame>
 </Ui>

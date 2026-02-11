@@ -30,6 +30,59 @@ function PandaPanel_OnShow()
 end
 
 --DE Code
+function PandaDEFrameQualityThresholdDropdown_OnLoad()
+    UIDropDownMenu_Initialize(this, PandaDEFrameQualityThresholdDropdown_Initialize);
+    UIDropDownMenu_SetSelectedValue(this,"1")
+	UIDropDownMenu_SetWidth(90, PandaDEFrameQualityThresholdDropdown);
+end
+
+function PandaDEFrameQualityThresholdDropdown_Initialize()
+	local selectedValue = UIDropDownMenu_GetSelectedValue(PandaDEFrameQualityThresholdDropdown);
+	local info;
+
+	info = {};
+	info.text = "|cFF1EFF00Uncommon|r";
+	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
+	info.value = "1"
+	if ( info.value == selectedValue ) then
+		info.checked = 1;
+	end
+	info.tooltipTitle = CAMERA_SMART;
+	info.tooltipText = OPTION_TOOLTIP_CAMERA_SMART;
+	UIDropDownMenu_AddButton(info);
+
+	info = {};
+	info.text = "|cFF0070ddRare|r";
+	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
+	info.value = "2"
+	if ( info.value == selectedValue ) then
+		info.checked = 1;
+	end
+	info.tooltipTitle = CAMERA_ALWAYS;
+	info.tooltipText = OPTION_TOOLTIP_CAMERA_ALWAYS;
+	UIDropDownMenu_AddButton(info);
+
+	info = {};
+	info.text = "|cffa335eeEpic|r";
+	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
+	info.value = "3"
+	if ( info.value == selectedValue ) then
+		info.checked = 1;
+	end
+	info.tooltipTitle = CAMERA_NEVER;
+	info.tooltipText = OPTION_TOOLTIP_CAMERA_NEVER;
+	UIDropDownMenu_AddButton(info);
+end
+
+function PandaDEFrameQualityThresholdDropdown_OnClick()
+    UIDropDownMenu_SetSelectedValue(PandaDEFrameQualityThresholdDropdown, this.value);
+	if ( UIDropDownMenu_GetSelectedID(UIOptionsFrameCameraDropDown) == 3 ) then
+		--OptionsFrame_DisableSlider(UIOptionsFrameSlider2);
+	else
+		--OptionsFrame_EnableSlider(UIOptionsFrameSlider2);
+	end
+end
+
 function PandaDEFrame_OnShow()
 
 end
