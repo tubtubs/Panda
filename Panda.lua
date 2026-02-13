@@ -8,6 +8,7 @@
 
 TODO:
 Minimap Icon [CHECK]
+Init System [CHECK]
 Query inventory
 -tooltips
 Onclick function
@@ -22,6 +23,17 @@ local libData = LibStub("LibDataBroker-1.1");
 --Event handler/init
 function PandaBorder_OnEvent()
 	if (event=="PLAYER_LOGIN") then -- Variables Loaded
+		if (not PA_Vars) then
+			PA_Vars = {
+				DE_Filters = {
+					BoP_toggle = false,
+					BlackList_toggle = false,
+					Blacklist = {},
+					QualityThreshold = PA_DEFAULT_RARITY
+				},
+				hideMinimapIcon = false,
+			}
+		end
 		if Panda_Icon == nil then
             Panda_Icon = {
                 hide = false
@@ -83,61 +95,99 @@ function PandaPanel_OnShow()
 end
 
 --DE Code
+function PandaDEFrame_Update()
+
+end
+
 function PandaDEFrameQualityThresholdDropdown_OnLoad()
     UIDropDownMenu_Initialize(this, PandaDEFrameQualityThresholdDropdown_Initialize);
-    UIDropDownMenu_SetSelectedValue(this,"1")
+	--if (PA_Vars) then --if its first run just load the default rarity
+    --	UIDropDownMenu_SetSelectedValue(this,PA_Vars.DE_Filters.QualityThreshold)
+	--else
+	--	UIDropDownMenu_SetSelectedValue(this,PA_DEFAULT_RARITY)
+	--end
 	UIDropDownMenu_SetWidth(90, PandaDEFrameQualityThresholdDropdown);
 end
 
 function PandaDEFrameQualityThresholdDropdown_Initialize()
-	local selectedValue = UIDropDownMenu_GetSelectedValue(PandaDEFrameQualityThresholdDropdown);
+	--local selectedValue = UIDropDownMenu_GetSelectedValue(PandaDEFrameQualityThresholdDropdown);
+	--if (PA_Vars) then --if its first run just load the default rarity
+    --	selectedValue = PA_Vars.DE_Filters.QualityThreshold
+	--else
+	--	selectedValue = PA_DEFAULT_RARITY
+	--end
+	
 	local info;
 
 	info = {};
-	info.text = "|cFF1EFF00Uncommon|r";
+	info.text = PA_RARITY["uncommon"].name;
 	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
-	info.value = "1"
+	info.value = PA_RARITY["uncommon"].value
 	if ( info.value == selectedValue ) then
 		info.checked = 1;
 	end
-	info.tooltipTitle = CAMERA_SMART;
+	info.tooltipTitle = PA_RARITY["uncommon"].name;
 	info.tooltipText = OPTION_TOOLTIP_CAMERA_SMART;
 	UIDropDownMenu_AddButton(info);
 
 	info = {};
-	info.text = "|cFF0070ddRare|r";
+	info.text = PA_RARITY["rare"].name
 	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
-	info.value = "2"
+	info.value = PA_RARITY["rare"].value
 	if ( info.value == selectedValue ) then
 		info.checked = 1;
 	end
-	info.tooltipTitle = CAMERA_ALWAYS;
+	info.tooltipTitle = PA_RARITY["uncommon"].name;
 	info.tooltipText = OPTION_TOOLTIP_CAMERA_ALWAYS;
 	UIDropDownMenu_AddButton(info);
 
 	info = {};
-	info.text = "|cffa335eeEpic|r";
+	info.text = PA_RARITY["epic"].name
 	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
-	info.value = "3"
+	info.value = PA_RARITY["epic"].value
 	if ( info.value == selectedValue ) then
 		info.checked = 1;
 	end
-	info.tooltipTitle = CAMERA_NEVER;
+	info.tooltipTitle = PA_RARITY["uncommon"].name;
 	info.tooltipText = OPTION_TOOLTIP_CAMERA_NEVER;
 	UIDropDownMenu_AddButton(info);
 end
 
 function PandaDEFrameQualityThresholdDropdown_OnClick()
     UIDropDownMenu_SetSelectedValue(PandaDEFrameQualityThresholdDropdown, this.value);
-	if ( UIDropDownMenu_GetSelectedID(UIOptionsFrameCameraDropDown) == 3 ) then
-		--OptionsFrame_DisableSlider(UIOptionsFrameSlider2);
-	else
-		--OptionsFrame_EnableSlider(UIOptionsFrameSlider2);
-	end
+	PA_Vars.DE_Filters.QualityThreshold = this.value;
+	PandaDEFrame_Update() -- going to need to update buttons after changing threshold
 end
 
 function PandaDEFrame_OnShow()
+	--Settings
+	--BOP
+	if PA_Vars.DE_Filters.BoP_toggle then
+		PandaDEFrameBOPFilterCheckButton:SetChecked(1)
+	else
+		PandaDEFrameBOPFilterCheckButton:SetChecked(0)
+	end
+	--Blacklist
+	if PA_Vars.DE_Filters.BlackList_toggle then
+		PandaDEFrameBlacklistFilterCheckButton:SetChecked(1)
+	else
+		PandaDEFrameBlacklistFilterCheckButton:SetChecked(0)
+	end
+	--Rarity threshold
+	UIDropDownMenu_Initialize(this, PandaDEFrameQualityThresholdDropdown_Initialize);
+	UIDropDownMenu_SetSelectedValue(PandaDEFrameQualityThresholdDropdown, PA_Vars.DE_Filters.QualityThreshold)
+	UIDropDownMenu_SetWidth(90, PandaDEFrameQualityThresholdDropdown);
+end
 
+
+function PandaDEFrameBOPFilterCheckButton_OnClick()
+	PA_Vars.DE_Filters.BoP_toggle = not PA_Vars.DE_Filters.BoP_toggle
+	PandaDEFrame_Update()
+end
+
+function PandaDEFrameBlackListFilterCheckButton_OnClick()
+	PA_Vars.DE_Filters.BlackList_toggle = not PA_Vars.DE_Filters.BlackList_toggle
+	PandaDEFrame_Update()
 end
 
 function PandaDEButton_OnClick()

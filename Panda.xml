@@ -447,6 +447,7 @@
                 </Layers>
                 <Scripts>
                     <OnClick>
+                    PandaDEFrameBOPFilterCheckButton_OnClick()
 					</OnClick>
                     <OnEnter>
 					GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
@@ -484,6 +485,7 @@
                 </Layers>
                 <Scripts>
                     <OnClick>
+                    PandaDEFrameBlackListFilterCheckButton_OnClick()
 					</OnClick>
                     <OnEnter>
 					GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
@@ -521,7 +523,8 @@
                         PandaDEFrameQualityThresholdDropdown_OnLoad();
                     </OnLoad>
                     <OnEnter>
-
+                    <OnShow>
+                    </OnShow>
                     </OnEnter>
                     <OnLeave>
                     </OnLeave>
