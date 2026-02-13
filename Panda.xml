@@ -258,13 +258,13 @@
             <OnLoad>
                 PandaBorder_OnLoad()
 			</OnLoad>
-            <OnEvent>
-            </OnEvent>
             <OnShow>
+                PandaBorder_OnShow()
             </OnShow>
             <OnHide>
 			</OnHide>
             <OnEvent>
+                PandaBorder_OnEvent()
             </OnEvent>
         </Scripts>
     </Frame>

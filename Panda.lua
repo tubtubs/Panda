@@ -6,11 +6,64 @@
 * Includes filters for bind on pickup, and an easy to use blacklist.
 * Click on the minimap icon, or type /panda to learn more
 
+TODO:
+Minimap Icon [CHECK]
+Query inventory
+-tooltips
+Onclick function
+Casting Bar appearance
+BoP filtering
+Blacklisting
+
 ]]--
+local libIcon = LibStub("LibDBIcon-1.0");
+local libData = LibStub("LibDataBroker-1.1");
+
+--Event handler/init
+function PandaBorder_OnEvent()
+	if (event=="PLAYER_LOGIN") then -- Variables Loaded
+		if Panda_Icon == nil then
+            Panda_Icon = {
+                hide = false
+            };
+        end
+		PA_MinimapIconRegister()
+	elseif (event=="BAG_UPDATE") then
+	end
+end
+
+--Minimap Button Setup
+function PA_MinimapIconRegister()
+    local iconData = libData:NewDataObject("Panda icon data", {
+        OnClick = function()
+            if PandaBorder:IsShown() then
+                PandaBorder:Hide();
+            else
+                PandaBorder:Show();
+            end
+        end,
+        OnTooltipShow = function(tooltip)
+            tooltip:SetText(PA_FULLNAME);
+        end,
+        icon = [[Interface\Addons\Panda\Assets\Panda.blp]]
+    });
+
+    libIcon:Register("Panda icon", iconData, Panda_Icon);
+end
 
 --=UI Code=--
+--Border Code
+function PandaBorder_OnShow()
+	-- if no subframe is shown, default to the DE one.
+	if not PandaDEFrame:IsShown() and not PandaOptionsFrame:IsShown() then
+		PandaDEFrame:Show()
+	end
+end
 --TabPanel Code
 function PandaBorder_OnLoad()
+	this:RegisterEvent("PLAYER_LOGIN");
+	this:RegisterEvent("BAG_UPDATE");
+
     PanelTemplates_SetNumTabs(this, PA_MAXTABS);
 end
 
@@ -115,7 +168,7 @@ local function TextMenu(arg)
             DEFAULT_CHAT_FRAME:AddMessage(w,1,1,1)
         end
     elseif arg == PA_OPT1 then
-        PandaDEFrame:Show()
+        --PandaDEFrame:Show()
         PandaBorder:Show()
     elseif  arg == PA_OPT2 then
         PandaOptionsFrame:Show()
