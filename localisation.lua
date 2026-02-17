@@ -6,6 +6,9 @@ PA_MAXTABS = 2
 PA_CAT1 = "Disenchanting"
 PA_CAT2 = "Options"
 
+PA_BLACKLISTBTN_TOOLTIP = "Right click again to blacklist this item.\nLeft click to cancel."
+PA_UNBLACKLISTBTN_TOOLTIP = "Right click again to unblacklist this item.\nLeft click to cancel."
+
 PA_RARITY = {
     ["poor"] = {
         color = "|cff9d9d9d",

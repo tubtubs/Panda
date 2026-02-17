@@ -13,8 +13,8 @@ Query inventory [CHECK]
 -tooltips [CHECK?]
 Onclick function [CHECK]
 Casting Bar appearance
-BoP filtering - might be rough
-Blacklisting - probably manageable
+BoP filtering - might be rough (I don't know how...)
+Blacklisting - probably manageable [CHECK]
 
 ]]--
 local libIcon = LibStub("LibDBIcon-1.0");
@@ -46,6 +46,8 @@ function PandaBorder_OnEvent()
 		end
 	end
 end
+
+
 
 --Minimap Button Setup
 function PA_MinimapIconRegister()
@@ -132,6 +134,8 @@ function PandaDEFrame_Update()
 		buttontxt = getglobal("PandaDEFrameDEButton"..i.."Name");
 		button = getglobal("PandaDEFrameDEButton"..i);
 		buttonicon = getglobal("PandaDEFrameDEButton"..i.."Icon");
+		blacklistButton = getglobal("PandaDEFrameBlackListButton"..i)
+		blacklistButton:Hide();
 		index = (scrollOffset) + i;
 		if index <= PA_DENumItems then
 			button:Show()
@@ -158,12 +162,22 @@ function Panda_GetAllItemsFromBag()
 				-- texture, itemCount, locked, quality, readable, lootable, itemLink
 				--DEFAULT_CHAT_FRAME:AddMessage(itemID)
 				if(itemID ~= nil) then
+					found = 0
+					if PA_Vars.DE_Filters.BlackList_toggle then
+						for i=1, getn(PA_Vars.DE_Filters.Blacklist) do
+								--DEFAULT_CHAT_FRAME:AddMessage(format("%s",i))
+							if PA_Vars.DE_Filters.Blacklist[i] == itemID then
+								found = 1
+								break
+							end
+						end
+					end
 					--print(itemID)
 					local itemName, _, itemRarity, _, _, itemType, itemSubType, itemEquipLoc, _, _, _ = GetItemInfo(itemID)
 					-- itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice
 					--DEFAULT_CHAT_FRAME:AddMessage(itemName)
 					--table.insert(Insert, {index = index, itemID = itemID, itemSellPrice = itemSellPrice, itemName = itemName})
-					if (itemEquipLoc~= "" and itemEquipLoc~= "INVTYPE_TABARD" and itemEquipLoc~= "INVTYPE_BODY" 
+					if (found == 0 and itemEquipLoc~= "" and itemEquipLoc~= "INVTYPE_TABARD" and itemEquipLoc~= "INVTYPE_BODY" 
 					and itemEquipLoc~= "INVTYPE_BAG" and itemEquipLoc~= "INVTYPE_QUIVER"
 					and itemEquipLoc~= "INVTYPE_AMMO" ) then
 						if tonumber(PA_Vars.DE_Filters.QualityThreshold) <= quality
@@ -279,11 +293,102 @@ function PandaDEButton_OnClick()
 	local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
 	id = this:GetID()
 	item = PA_DEItemList[id + scrollOffset]
+	blacklistButton = getglobal("PandaDEFrameBlackListButton"..id)
 	if arg1 == 'LeftButton' then
 		CastSpellByName("Disenchant")
 		PickupContainerItem(item.bag, item.slot)
-    elseif arg1 == 'RightButton' then
-		DEFAULT_CHAT_FRAME:AddMessage("Blacklist?")
+		PA_HideAllBlackListButtons()
+	end
+end
+
+function PA_HideAllBlackListButtons()
+	for i=1, PA_DEBUTTONS_NUM do
+		blacklistButton = getglobal("PandaDEFrameBlackListButton"..i)
+		blacklistButton:Hide()
+	end
+end
+
+function PandaDEButton_OnMouseDown()
+	id = this:GetID()
+	if arg1 == 'RightButton' then
+		PA_HideAllBlackListButtons()
+		blacklistButton = getglobal("PandaDEFrameBlackListButton"..id)
+		blacklistButton:Show()
+	end
+end
+
+function PandaDEFrameBlackListButton_OnShow()
+	id = this:GetID()
+	blacklistButton = getglobal("PandaDEFrameBlackListButton"..id)
+	if not PA_Vars.DE_Filters.BlackList_toggle then
+		local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
+		id = this:GetID()
+		item = PA_DEItemList[id + scrollOffset]
+		found = 0
+		for i=1, getn(PA_Vars.DE_Filters.Blacklist) do
+			if PA_Vars.DE_Filters.Blacklist[i] == itemID then
+				found = 1
+				break
+			end
+		end
+		if found == 1 then
+			blacklistButton:SetNormalTexture([[Interface\Addons\Panda\Assets\undoblacklist.tga]])
+			blacklistButton:SetScript("OnMouseDown",PandaDEFrameBlackListButton_UnBlackList)
+			blacklistButton:SetScript("OnEnter",PandaDEFrameBlackListButton_UnBlackListTooltip)
+		else
+			blacklistButton:SetNormalTexture([[Interface\Addons\Panda\Assets\blacklist.tga]])
+			blacklistButton:SetScript("OnMouseDown",PandaDEFrameBlackListButton_BlackList)
+			blacklistButton:SetScript("OnEnter",PandaDEFrameBlackListButton_BlackListTooltip)
+		end
+	else
+		blacklistButton:SetNormalTexture([[Interface\Addons\Panda\Assets\blacklist.tga]])
+		blacklistButton:SetScript("OnMouseDown",PandaDEFrameBlackListButton_BlackList)
+		blacklistButton:SetScript("OnEnter",PandaDEFrameBlackListButton_BlackListTooltip)
+	end
+end
+
+function PandaDEFrameBlackListButton_BlackListTooltip()
+	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
+	GameTooltip:SetText(PA_BLACKLISTBTN_TOOLTIP);
+	GameTooltip:Show()
+end
+
+function PandaDEFrameBlackListButton_UnBlackListTooltip()
+	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
+	GameTooltip:SetText(PA_UNBLACKLISTBTN_TOOLTIP);
+	GameTooltip:Show()
+end
+
+function PandaDEFrameBlackListButton_BlackList()
+	local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
+	id = this:GetID()
+	item = PA_DEItemList[id + scrollOffset]
+	if arg1 == 'LeftButton' then
+		this:Hide()
+	elseif arg1 == 'RightButton' then
+		table.insert(PA_Vars.DE_Filters.Blacklist,item.id)
+		this:Hide()
+		PandaDEFrame_Update()
+	end
+end
+
+function PandaDEFrameBlackListButton_UnBlackList()
+	local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
+	id = this:GetID()
+	item = PA_DEItemList[id + scrollOffset]
+	if arg1 == 'LeftButton' then
+		this:Hide()
+	elseif arg1 == 'RightButton' then
+		for i=1, getn(PA_Vars.DE_Filters.Blacklist) do
+				--DEFAULT_CHAT_FRAME:AddMessage(format("%s",i))
+			if PA_Vars.DE_Filters.Blacklist[i] == itemID then
+				found = i
+				break
+			end
+		end
+		table.remove(PA_Vars.DE_Filters.Blacklist,found)
+		this:Hide()
+		PandaDEFrame_Update()
 	end
 end
 

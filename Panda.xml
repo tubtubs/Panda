@@ -107,6 +107,33 @@
             </Anchors>
         </HighlightTexture>
     </Button>
+    <Button name="PandaDEBlackListButtonTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="36" y="36"/>
+        </Size>
+        <NormalTexture name="$parentBlacklist" file="Interface\Addons\Panda\Assets\blacklist.tga">
+            <Size>
+                <AbsDimension x="36" y="36"/>
+            </Size>
+            <Anchors>
+                <Anchor point="CENTER">
+                    <Offset>
+                        <AbsDimension x="0" y="-1"/>
+                    </Offset>
+                </Anchor>
+            </Anchors>
+        </NormalTexture>
+        <HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
+        <Scripts>
+            <OnLeave>
+                GameTooltip:Hide();
+            </OnLeave>
+            <OnShow>
+                PandaDEFrameBlackListButton_OnShow()
+                this:SetFrameStrata("FULLSCREEN_DIALOG")
+            </OnShow>
+        </Scripts>
+    </Button>
     <Button name="PandaDEButtonTemplate" virtual="true">
         <Size>
             <AbsDimension x="36" y="36"/>
@@ -165,7 +192,7 @@
                 PandaDEButton_OnClick()
             </OnClick>
             <OnMouseDown>
-                PandaDEButton_OnClick()
+                PandaDEButton_OnMouseDown()
 			</OnMouseDown>
         </Scripts>
     </Button>
@@ -376,24 +403,24 @@
             </Layer>
         </Layers>
         <Frames>
-        <ScrollFrame name="$parentDEScrollFrame" inherits="FauxScrollFrameTemplate">
-				<Size>
-					<AbsDimension x="385" y="285"/>
-				</Size>
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="$parent">
-						<Offset>
-							<AbsDimension x="-65" y="-75"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnVerticalScroll>
-						<!-- TODO: Create new update method-->
+            <ScrollFrame name="$parentDEScrollFrame" inherits="FauxScrollFrameTemplate">
+                <Size>
+                    <AbsDimension x="385" y="285"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="$parent">
+                        <Offset>
+                            <AbsDimension x="-65" y="-75"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnVerticalScroll>
+                        <!-- TODO: Create new update method-->
 							FauxScrollFrame_OnVerticalScroll(6, PandaDEFrame_Update);
-					</OnVerticalScroll>
-				</Scripts>
-			</ScrollFrame>
+                    </OnVerticalScroll>
+                </Scripts>
+            </ScrollFrame>
             <Button name="$parentDEButton1" inherits="PandaDEButtonTemplate" id="1">
                 <Anchors>
                     <Anchor point="TOPLEFT">
@@ -448,6 +475,61 @@
                     </Anchor>
                 </Anchors>
             </Button>
+            <Button name="$parentBlackListButton1" inherits="PandaDEBlackListButtonTemplate" id="1" hidden="true">
+                <Anchors>
+                    <Anchor point="CENTER" relativeTo="$parentDEButton1">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentBlackListButton2" inherits="PandaDEBlackListButtonTemplate" id="2" hidden="true">
+                <Anchors>
+                    <Anchor point="CENTER" relativeTo="$parentDEButton2">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentBlackListButton3" inherits="PandaDEBlackListButtonTemplate" id="3" hidden="true">
+                <Anchors>
+                    <Anchor point="CENTER" relativeTo="$parentDEButton3">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentBlackListButton4" inherits="PandaDEBlackListButtonTemplate" id="4" hidden="true">
+                <Anchors>
+                    <Anchor point="CENTER" relativeTo="$parentDEButton4">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentBlackListButton5" inherits="PandaDEBlackListButtonTemplate" id="5" hidden="true">
+                <Anchors>
+                    <Anchor point="CENTER" relativeTo="$parentDEButton5">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="$parentBlackListButton6" inherits="PandaDEBlackListButtonTemplate" id="6" hidden="true">
+                <Anchors>
+                    <Anchor point="CENTER" relativeTo="$parentDEButton6">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+
             <CheckButton name="$parentBOPFilterCheckButton" inherits="OptionsCheckButtonTemplate" checked="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="$parentDEButton6">
@@ -550,7 +632,7 @@
                         PandaDEFrameQualityThresholdDropdown_OnLoad();
                     </OnLoad>
                     <OnEnter>
-                    <OnShow>
+                        <OnShow>
                     </OnShow>
                     </OnEnter>
                     <OnLeave>
