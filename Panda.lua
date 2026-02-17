@@ -9,12 +9,12 @@
 TODO:
 Minimap Icon [CHECK]
 Init System [CHECK]
-Query inventory
--tooltips
-Onclick function
+Query inventory [CHECK]
+-tooltips [CHECK?]
+Onclick function [CHECK]
 Casting Bar appearance
-BoP filtering
-Blacklisting
+BoP filtering - might be rough
+Blacklisting - probably manageable
 
 ]]--
 local libIcon = LibStub("LibDBIcon-1.0");
@@ -41,6 +41,9 @@ function PandaBorder_OnEvent()
         end
 		PA_MinimapIconRegister()
 	elseif (event=="BAG_UPDATE") then
+		if PandaDEFrame:IsShown() then
+			PandaDEFrame_Update()
+		end
 	end
 end
 
@@ -95,8 +98,95 @@ function PandaPanel_OnShow()
 end
 
 --DE Code
-function PandaDEFrame_Update()
+PA_DEBUTTONS_NUM = 6
+NUM_BAG_SLOTS = 4
+PA_DEItemList = {}
+PA_DENumItems = 0
 
+function PA_DEButtonTooltip()
+	local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
+	id = this:GetID()
+	itemID = PA_DEItemList[id + scrollOffset].id
+	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
+	GameTooltip:SetHyperlink("item:"..itemID..":0:0:0");
+	GameTooltip:Show();
+end
+
+function PA_GetColor(rarity)
+	for i,j in pairs(PA_RARITY) do
+		if tonumber(j.value) == rarity then
+			return j.color
+		end
+	end
+end
+
+function PandaDEFrame_Update()
+	--get item list
+	Panda_GetAllItemsFromBag()
+	PA_DENumItems = getn(PA_DEItemList)
+	local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
+	local index;
+	
+	--start changing display buttons
+	for i=1, PA_DEBUTTONS_NUM do
+		buttontxt = getglobal("PandaDEFrameDEButton"..i.."Name");
+		button = getglobal("PandaDEFrameDEButton"..i);
+		buttonicon = getglobal("PandaDEFrameDEButton"..i.."Icon");
+		index = (scrollOffset) + i;
+		if index <= PA_DENumItems then
+			button:Show()
+			color = PA_GetColor(PA_DEItemList[index].rarity)
+			buttonicon:SetTexture(PA_DEItemList[index].icon)
+			buttontxt:SetText(color .. PA_DEItemList[index].name)
+		else
+			button:Hide()
+		end
+	end
+	FauxScrollFrame_Update(PandaDEFrameDEScrollFrame, PA_DENumItems , PA_DEBUTTONS_NUM, PA_DEBUTTONS_NUM);
+end
+
+function Panda_GetAllItemsFromBag()
+	PA_DEItemList = {}
+	for slot=0, NUM_BAG_SLOTS do
+		for index=1, GetContainerNumSlots(slot) do
+			local item = GetContainerItemLink(0, index)
+			if(GetContainerItemLink(slot, index)) then
+				--print(item)
+				local _, _, itemID = string.find(GetContainerItemLink(slot,index), "item:(%d+):%d+:%d+:%d+")
+				local texture, _, _, quality, _, _, _ = GetContainerItemInfo(slot,index)
+				--local durMin, durMax = GetContainerItemDurability(slot, index)
+				-- texture, itemCount, locked, quality, readable, lootable, itemLink
+				--DEFAULT_CHAT_FRAME:AddMessage(itemID)
+				if(itemID ~= nil) then
+					--print(itemID)
+					local itemName, _, itemRarity, _, _, itemType, itemSubType, itemEquipLoc, _, _, _ = GetItemInfo(itemID)
+					-- itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice
+					--DEFAULT_CHAT_FRAME:AddMessage(itemName)
+					--table.insert(Insert, {index = index, itemID = itemID, itemSellPrice = itemSellPrice, itemName = itemName})
+					if (itemEquipLoc~= "" and itemEquipLoc~= "INVTYPE_TABARD" and itemEquipLoc~= "INVTYPE_BODY" 
+					and itemEquipLoc~= "INVTYPE_BAG" and itemEquipLoc~= "INVTYPE_QUIVER"
+					and itemEquipLoc~= "INVTYPE_AMMO" ) then
+						if tonumber(PA_Vars.DE_Filters.QualityThreshold) <= quality
+							and tonumber(PA_RARITY["common"].value) < quality
+							and quality ~= tonumber(PA_RARITY["legendary"].value) then
+						info = {
+							bag = slot,
+							slot = index,
+							id = itemID, 
+							name = itemName,
+							icon = texture,
+							rarity = quality,
+						}
+						table.insert(PA_DEItemList, info)
+						--DEFAULT_CHAT_FRAME:AddMessage(format("itemID: %s itemName: %s itemType: %s itemSubType: %s quality: %s texture: %s", itemID, itemName, itemType, itemEquipLoc, quality, texture))
+						end
+					end
+					--DEFAULT_CHAT_FRAME:AddMessage(format("%s %s %s", a, b ,itemName))
+				end
+			end
+		end
+	end
+	--DEFAULT_CHAT_FRAME:AddMessage(format("Size: %s", getn(PA_DEItemList)))
 end
 
 function PandaDEFrameQualityThresholdDropdown_OnLoad()
@@ -126,8 +216,6 @@ function PandaDEFrameQualityThresholdDropdown_Initialize()
 	if ( info.value == selectedValue ) then
 		info.checked = 1;
 	end
-	info.tooltipTitle = PA_RARITY["uncommon"].name;
-	info.tooltipText = OPTION_TOOLTIP_CAMERA_SMART;
 	UIDropDownMenu_AddButton(info);
 
 	info = {};
@@ -137,8 +225,6 @@ function PandaDEFrameQualityThresholdDropdown_Initialize()
 	if ( info.value == selectedValue ) then
 		info.checked = 1;
 	end
-	info.tooltipTitle = PA_RARITY["uncommon"].name;
-	info.tooltipText = OPTION_TOOLTIP_CAMERA_ALWAYS;
 	UIDropDownMenu_AddButton(info);
 
 	info = {};
@@ -148,8 +234,6 @@ function PandaDEFrameQualityThresholdDropdown_Initialize()
 	if ( info.value == selectedValue ) then
 		info.checked = 1;
 	end
-	info.tooltipTitle = PA_RARITY["uncommon"].name;
-	info.tooltipText = OPTION_TOOLTIP_CAMERA_NEVER;
 	UIDropDownMenu_AddButton(info);
 end
 
@@ -177,6 +261,7 @@ function PandaDEFrame_OnShow()
 	UIDropDownMenu_Initialize(this, PandaDEFrameQualityThresholdDropdown_Initialize);
 	UIDropDownMenu_SetSelectedValue(PandaDEFrameQualityThresholdDropdown, PA_Vars.DE_Filters.QualityThreshold)
 	UIDropDownMenu_SetWidth(90, PandaDEFrameQualityThresholdDropdown);
+	PandaDEFrame_Update()
 end
 
 
@@ -191,7 +276,15 @@ function PandaDEFrameBlackListFilterCheckButton_OnClick()
 end
 
 function PandaDEButton_OnClick()
-
+	local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
+	id = this:GetID()
+	item = PA_DEItemList[id + scrollOffset]
+	if arg1 == 'LeftButton' then
+		CastSpellByName("Disenchant")
+		PickupContainerItem(item.bag, item.slot)
+    elseif arg1 == 'RightButton' then
+		DEFAULT_CHAT_FRAME:AddMessage("Blacklist?")
+	end
 end
 
 --Slash command setup

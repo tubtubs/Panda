@@ -113,14 +113,14 @@
         </Size>
         <Layers>
             <Layer level="OVERLAY">
-                <FontString name="$parentName" inherits="GameFontHighlightSmallOutline" text="Thunderfury, Blessed Blade of the Windseeker">
+                <FontString name="$parentName" inherits="GameFontHighlightSmallOutline" justifyH="LEFT" text="Thunderfury, Blessed Blade of the Windseeker">
                     <Size>
                         <AbsDimension x="356" y="10"/>
                     </Size>
                     <Anchors>
                         <Anchor point="CENTER">
                             <Offset>
-                                <AbsDimension x="146" y="2"/>
+                                <AbsDimension x="200" y="2"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
@@ -155,9 +155,18 @@
         </NormalTexture>
         <HighlightTexture alphaMode="ADD" file="Interface\Buttons\ButtonHilight-Square"/>
         <Scripts>
+            <OnEnter>
+                PA_DEButtonTooltip()
+            </OnEnter>
+            <OnLeave>
+                GameTooltip:Hide();
+            </OnLeave>
             <OnClick>
                 PandaDEButton_OnClick()
-			</OnClick>
+            </OnClick>
+            <OnMouseDown>
+                PandaDEButton_OnClick()
+			</OnMouseDown>
         </Scripts>
     </Button>
     <Frame name="PandaBorder" toplevel="true" movable="true" parent="UIParent" hidden="true">
@@ -367,6 +376,24 @@
             </Layer>
         </Layers>
         <Frames>
+        <ScrollFrame name="$parentDEScrollFrame" inherits="FauxScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="385" y="285"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="-65" y="-75"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						<!-- TODO: Create new update method-->
+							FauxScrollFrame_OnVerticalScroll(6, PandaDEFrame_Update);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
             <Button name="$parentDEButton1" inherits="PandaDEButtonTemplate" id="1">
                 <Anchors>
                     <Anchor point="TOPLEFT">
