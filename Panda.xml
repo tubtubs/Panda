@@ -292,6 +292,7 @@
         </Frames>
         <Scripts>
             <OnLoad>
+                tinsert(UISpecialFrames, "PandaBorder");
                 PandaBorder_OnLoad()
 			</OnLoad>
             <OnShow>
@@ -362,6 +363,30 @@
             <Layer level="ARTWORK">
 			</Layer>
             <Layer level="OVERLAY">
+                <FontString name="$parentEmptyList" inherits="GameFontHighlightSmallOutline" justifyH="LEFT" text="PA_DEEMPTY_TOOLTIP" hidden="true">
+                    <Size>
+                        <AbsDimension x="280" y="40"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-150"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentInstructions" inherits="GameFontHighlightSmallOutline" text="PA_DE_TOOLTIP" hidden="false">
+                    <Size>
+                        <AbsDimension x="280" y="40"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="15" y="-35"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
                 <!--
                 <FontString name="$parentBOPFilterTip" inherits="GameFontHighlightSmallOutline" text="Filter out Bind on Pickup items">
                     <Size>

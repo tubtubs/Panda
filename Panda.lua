@@ -12,9 +12,10 @@ Init System [CHECK]
 Query inventory [CHECK]
 -tooltips [CHECK?]
 Onclick function [CHECK]
-Casting Bar appearance
-BoP filtering - might be rough (I don't know how...)
+Casting Bar appearance -> might be overrated
+BoP filtering - managed to scan it with tooltips [CHECK]
 Blacklisting - probably manageable [CHECK]
+Make window movable?
 
 ]]--
 local libIcon = LibStub("LibDBIcon-1.0");
@@ -129,8 +130,9 @@ function PandaDEFrame_Update()
 	PA_DENumItems = getn(PA_DEItemList)
 	local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
 	local index;
-	
+
 	--start changing display buttons
+
 	for i=1, PA_DEBUTTONS_NUM do
 		buttontxt = getglobal("PandaDEFrameDEButton"..i.."Name");
 		button = getglobal("PandaDEFrameDEButton"..i);
@@ -148,6 +150,11 @@ function PandaDEFrame_Update()
 		end
 	end
 	FauxScrollFrame_Update(PandaDEFrameDEScrollFrame, PA_DENumItems , PA_DEBUTTONS_NUM, PA_DEBUTTONS_NUM);
+	if PA_DENumItems ~= 0 then
+		PandaDEFrameEmptyList:Hide()
+	else
+		PandaDEFrameEmptyList:Show()
+	end
 end
 
 function Panda_GetAllItemsFromBag()

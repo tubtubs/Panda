@@ -8,6 +8,8 @@ PA_CAT2 = "Options"
 
 PA_BLACKLISTBTN_TOOLTIP = "Right click again to blacklist this item.\nLeft click to cancel."
 PA_UNBLACKLISTBTN_TOOLTIP = "Right click again to unblacklist this item.\nLeft click to cancel."
+PA_DEEMPTY_TOOLTIP = "No equipment found, check filters and inventory."
+PA_DE_TOOLTIP = "Click an item to disenchant.\nRight click an item to blacklist."
 
 PA_RARITY = {
     ["poor"] = {
