@@ -110,7 +110,8 @@ function PA_DEButtonTooltip()
 	id = this:GetID()
 	itemID = PA_DEItemList[id + scrollOffset].id
 	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
-	GameTooltip:SetHyperlink("item:"..itemID..":0:0:0");
+	GameTooltip:SetBagItem(PA_DEItemList[id + scrollOffset].bag,
+	PA_DEItemList[id + scrollOffset].slot);
 	GameTooltip:Show();
 end
 
@@ -153,7 +154,7 @@ function Panda_GetAllItemsFromBag()
 	PA_DEItemList = {}
 	for slot=0, NUM_BAG_SLOTS do
 		for index=1, GetContainerNumSlots(slot) do
-			local item = GetContainerItemLink(0, index)
+			--local item = GetContainerItemLink(0, index)
 			if(GetContainerItemLink(slot, index)) then
 				--print(item)
 				local _, _, itemID = string.find(GetContainerItemLink(slot,index), "item:(%d+):%d+:%d+:%d+")
