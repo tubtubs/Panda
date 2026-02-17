@@ -173,8 +173,23 @@ function Panda_GetAllItemsFromBag()
 							end
 						end
 					end
+
 					--print(itemID)
 					local itemName, _, itemRarity, _, _, itemType, itemSubType, itemEquipLoc, _, _, _ = GetItemInfo(itemID)
+					if PA_Vars.DE_Filters.BoP_toggle then
+						GameTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+						GameTooltip:SetBagItem(slot, index)
+						for i = 1, GameTooltip:NumLines() do
+							local leftText = getglobal("GameTooltipTextLeft" .. i):GetText()
+							--DEFAULT_CHAT_FRAME:AddMessage(leftText)
+							if leftText == "Soulbound" then
+								found = 1
+								break
+								--DEFAULT_CHAT_FRAME:AddMessage(itemName .. "Item is Soulbound")
+							end
+						end
+						GameTooltip:Hide()
+					end
 					-- itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice
 					--DEFAULT_CHAT_FRAME:AddMessage(itemName)
 					--table.insert(Insert, {index = index, itemID = itemID, itemSellPrice = itemSellPrice, itemName = itemName})
