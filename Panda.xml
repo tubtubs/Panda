@@ -196,7 +196,7 @@
 			</OnMouseDown>
         </Scripts>
     </Button>
-    <Frame name="PandaBorder" toplevel="true" movable="true" parent="UIParent" hidden="true">
+    <Frame name="PandaBorder" enableMouse="true" toplevel="true" movable="true" parent="UIParent" hidden="true">
         <Size>
             <AbsDimension x="384" y="512"/>
         </Size>
@@ -674,6 +674,12 @@
 			</OnLoad>
             <OnEvent>
 			</OnEvent>
+            <OnMouseDown>
+                PandaBorder:StartMoving()
+            </OnMouseDown>
+            <OnMouseUp>
+                PandaBorder:StopMovingOrSizing()
+            </OnMouseUp>
         </Scripts>
     </Frame>
     <Frame name="PandaOptionsFrame" setAllPoints="true" enableMouse="true" parent="PandaBorder" hidden="true" id="2">
@@ -759,6 +765,12 @@
 			</OnLoad>
             <OnEvent>
 			</OnEvent>
+            <OnMouseDown>
+                PandaBorder:StartMoving()
+            </OnMouseDown>
+            <OnMouseUp>
+                PandaBorder:StopMovingOrSizing()
+            </OnMouseUp>
         </Scripts>
     </Frame>
 </Ui>

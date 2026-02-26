@@ -15,7 +15,10 @@ Onclick function [CHECK]
 Casting Bar appearance -> might be overrated
 BoP filtering - managed to scan it with tooltips [CHECK]
 Blacklisting - probably manageable [CHECK]
-Make window movable?
+Make window movable[CHECK]
+Need to be able to reset window position
+-Slash command
+-Minimap Icon Menu
 
 ]]--
 local libIcon = LibStub("LibDBIcon-1.0");
