@@ -2,7 +2,7 @@
 
 local lib = {}
 lib._version = "0.0.6"
-local _G = getfenv(0)
+local _G = getfenv(0) -- needed to add for default vanilla wow, no other issues yet
 _G["jKwery"] = lib
 
 lib._types = {}

@@ -23,38 +23,8 @@ Need to be able to reset window position
 ]]--
 local libIcon = LibStub("LibDBIcon-1.0");
 local libData = LibStub("LibDataBroker-1.1");
+local ClickedDEButton = 0;
 local J = jKwery
---local JKT = jKweryTest
-
-local castFrame = CreateFrame("Frame", nil, UIParent)
-castFrame:SetWidth(220)
-castFrame:SetHeight(28)
-castFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 70)
-castFrame:SetFrameStrata("HIGH")
-
-local castBg = castFrame:CreateTexture(nil, "BACKGROUND")
-castBg:SetAllPoints()
-castBg:SetTexture(0.08, 0.08, 0.08, 0.9)
-
-local castBar = CreateFrame("StatusBar", nil, castFrame)
-castBar:SetPoint("TOPLEFT", castFrame, "TOPLEFT", 2, -2)
-castBar:SetPoint("BOTTOMRIGHT", castFrame, "BOTTOMRIGHT", -2, 2)
-castBar:SetMinMaxValues(0, 100)
-castBar:SetValue(0)
-castBar:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
-castBar:SetStatusBarColor(0.3, 0.6, 1)
-
-local castLabel = castBar:CreateFontString(nil, "OVERLAY")
-castLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
-castLabel:SetPoint("CENTER", castBar, "CENTER", 0, 0)
-castLabel:SetTextColor(1, 1, 1, 1)
-
--- Flash overlay: invisible by default, flashes green or red on cast events
-local castFlashTex = castFrame:CreateTexture(nil, "OVERLAY")
-castFlashTex:SetAllPoints()
-castFlashTex:SetTexture(1, 1, 1, 1)
-castFlashTex:SetVertexColor(1, 1, 1, 0)
-castFrame:Hide()
 
 --Event handler/init
 function PandaBorder_OnEvent()
@@ -78,58 +48,71 @@ function PandaBorder_OnEvent()
 
 		PA_MinimapIconRegister()
 	elseif (event=="SPELLCAST_START") then
-		DEFAULT_CHAT_FRAME:AddMessage(format("CASTING: %s %s", arg1, arg2))
-		castBar:SetValue(0)
-		castBar:SetStatusBarColor(0.3, 0.6, 1)
-		castFlashTex:SetVertexColor(1, 1, 1, 0)
-		castLabel:SetText(arg1)	
-		J:Sequence({
-			J:Progress(castBar, 0, 0),
-			J:FadeIn(castFrame, 0.2),
-
-			-- Cast 1: Frostbolt fills to 100%
-			J:Progress(castBar, 100, arg2/1000, "linear"),
-
-			-- Success: green flash then turn bar green
-			J:Group({
-			J:Tween(castFlashTex, {
-				type = "color", from = {0.2,1,0.4,0}, to = {0.2,1,0.4,0.6}, duration = 0.08,
-			}),
-			J:Tween(castFlashTex, {
-				type = "color", from = {0.2,1,0.4,0.6}, to = {0.2,1,0.4,0}, duration = 0.3,
-				onStart = function() castBar:SetStatusBarColor(0.2, 1, 0.4) end,
-			}),
-			}),
-			J:Delay(0.5),
-			J:FadeOut(castFrame, 0.3),
-		})
-	elseif (event=="SPELLCAST_STOP") then
-	elseif (event=="SPELLCAST_INTERRUPTED") then
-		DEFAULT_CHAT_FRAME:AddMessage("INTERRUPTED")
-		J:Sequence({
-		-- Interrupt: red flash + shake + label change
-			J:Group({
-			J:Shake(castFrame, 5, 0.4),
+		if (arg1 == "Disenchant" and ClickedDEButton ~=0) then
+			castBar = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_StatusBar")
+			castFlashTex = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_OverText")
+			castFrame = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton)
+			castBar:SetValue(0)
+			castBar:SetStatusBarColor(0.3, 0.6, 1)
+			castFlashTex:SetVertexColor(1, 1, 1, 0)
+			--castLabel:SetText(arg1)	
 			J:Sequence({
+				J:Progress(castBar, 0, 0),
+				J:FadeIn(castFrame, 0.2),
+
+				-- Cast 1: Frostbolt fills to 100%
+				J:Progress(castBar, 100, 2.8, "linear"),
+
+				-- Success: green flash then turn bar green
+				J:Group({
 				J:Tween(castFlashTex, {
-				type = "color", from = {1,0.1,0.1,0}, to = {1,0.1,0.1,0.7}, duration = 0.07,
+					type = "color", from = {0.2,1,0.4,0}, to = {0.2,1,0.4,0.6}, duration = 0.08,
 				}),
 				J:Tween(castFlashTex, {
-				type = "color", from = {1,0.1,0.1,0.7}, to = {1,0.1,0.1,0}, duration = 0.4,
+					type = "color", from = {0.2,1,0.4,0.6}, to = {0.2,1,0.4,0}, duration = 0.3,
+					onStart = function() castBar:SetStatusBarColor(0.2, 1, 0.4) end,
 				}),
-			}),
-			J:Tween(castFrame, {
-				type = "custom", from = 0, to = 0, duration = 0.01,
-				setter = function()
-				castBar:SetStatusBarColor(1, 0.2, 0.2)
-				castLabel:SetText("Interrupted!")
-				end,
-			}),
-			J:Delay(0.8),
-			J:FadeOut(castFrame, 0.3),
-			J:Stop()
-			}),
-		})
+				}),
+				J:Delay(0.5),
+				J:FadeOut(castFrame, 0.3),
+			})
+		end
+	elseif (event=="SPELLCAST_STOP") then
+		castFrame = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton)
+		if castFrame and not castFrame:IsShown() then
+			ClickedDEButton = 0
+		end
+	elseif (event=="SPELLCAST_INTERRUPTED") then
+		if ClickedDEButton ~= 0 then
+			castBar = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_StatusBar")
+			castFlashTex = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_OverText")
+			castFrame = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton)
+			J:Sequence({
+			-- Interrupt: red flash + shake + label change
+				J:Group({
+				J:Shake(castFrame, 5, 0.4),
+				J:Sequence({
+					J:Tween(castFlashTex, {
+					type = "color", from = {1,0.1,0.1,0}, to = {1,0.1,0.1,0.7}, duration = 0.07,
+					}),
+					J:Tween(castFlashTex, {
+					type = "color", from = {1,0.1,0.1,0.7}, to = {1,0.1,0.1,0}, duration = 0.4,
+					}),
+				}),
+				J:Tween(castFrame, {
+					type = "custom", from = 0, to = 0, duration = 0.01,
+					setter = function()
+					castBar:SetStatusBarColor(1, 0.2, 0.2)
+					--castLabel:SetText("Interrupted!")
+					end,
+				}),
+				J:Delay(0.8),
+				J:FadeOut(castFrame, 0.3),
+				J:Stop(),
+				}),
+			})
+			ClickedDEButton = 0;
+		end
 	elseif (event=="BAG_UPDATE") then
 		if PandaDEFrame:IsShown() then
 			PandaDEFrame_Update()
@@ -407,6 +390,7 @@ end
 function PandaDEButton_OnClick()
 	local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
 	id = this:GetID()
+	ClickedDEButton = id
 	item = PA_DEItemList[id + scrollOffset]
 	blacklistButton = getglobal("PandaDEFrameBlackListButton"..id)
 	if arg1 == 'LeftButton' then
