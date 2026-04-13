@@ -428,6 +428,24 @@
             <Layer level="ARTWORK">
             </Layer>
             <Layer level="OVERLAY">
+                <Texture name="$parentFlash" hidden="true">   
+                    <Color r="1.00" g="0.984" b="0.604" a="0.3" />
+                    <Size>
+                        <AbsDimension x="438" y="583"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="25" y="-80"/>
+                            </Offset>
+                        </Anchor>
+                        <Anchor point="BOTTOMRIGHT">
+                            <Offset>
+                                <AbsDimension x="-45" y="145"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
                 <FontString name="$parentEmptyList" inherits="GameFontHighlightSmallOutline" justifyH="LEFT" text="PA_DEEMPTY_TOOLTIP" hidden="true">
                     <Size>
                         <AbsDimension x="280" y="40"/>

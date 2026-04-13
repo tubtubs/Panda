@@ -20,6 +20,12 @@ Need to be able to reset window position
 -Slash command
 -Minimap Icon Menu
 
+ANIMATION IDEAS:
+Shatter the item icon (/jkt shatter)
+Blackhole effect on them item would be SO DOPE
+Smoke could be cool too
+Purple firework effects along with the flashing background
+
 ]]--
 local libIcon = LibStub("LibDBIcon-1.0");
 local libData = LibStub("LibDataBroker-1.1");
@@ -45,72 +51,28 @@ function PandaBorder_OnEvent()
                 hide = false
             };
         end
-
 		PA_MinimapIconRegister()
+
 	elseif (event=="SPELLCAST_START") then
 		if (arg1 == "Disenchant" and ClickedDEButton ~=0) then
-			castBar = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_StatusBar")
-			castFlashTex = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_OverText")
-			castFrame = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton)
-			castBar:SetValue(0)
-			castBar:SetStatusBarColor(0.3, 0.6, 1)
-			castFlashTex:SetVertexColor(1, 1, 1, 0)
-			--castLabel:SetText(arg1)	
-			J:Sequence({
-				J:Progress(castBar, 0, 0),
-				J:FadeIn(castFrame, 0.2),
-
-				-- Cast 1: Frostbolt fills to 100%
-				J:Progress(castBar, 100, 2.8, "linear"),
-
-				-- Success: green flash then turn bar green
-				J:Group({
-				J:Tween(castFlashTex, {
-					type = "color", from = {0.2,1,0.4,0}, to = {0.2,1,0.4,0.6}, duration = 0.08,
-				}),
-				J:Tween(castFlashTex, {
-					type = "color", from = {0.2,1,0.4,0.6}, to = {0.2,1,0.4,0}, duration = 0.3,
-					onStart = function() castBar:SetStatusBarColor(0.2, 1, 0.4) end,
-				}),
-				}),
-				J:Delay(0.5),
-				J:FadeOut(castFrame, 0.3),
-			})
+			btn = getglobal("PandaDEFrameDEButton" .. ClickedDEButton)
+			Panda_BlackholeStart(btn)
+			btnicon = getglobal("PandaDEFrameDEButton"..ClickedDEButton.."Icon");	
+			txt = btnicon:GetTexture()
+			Panda_Shatter(btn,btnicon,txt)
 		end
 	elseif (event=="SPELLCAST_STOP") then
 		castFrame = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton)
 		if castFrame and not castFrame:IsShown() then
-			ClickedDEButton = 0
+			--ClickedDEButton = 0
 		end
 	elseif (event=="SPELLCAST_INTERRUPTED") then
 		if ClickedDEButton ~= 0 then
-			castBar = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_StatusBar")
-			castFlashTex = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_OverText")
-			castFrame = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton)
-			J:Sequence({
-			-- Interrupt: red flash + shake + label change
-				J:Group({
-				J:Shake(castFrame, 5, 0.4),
-				J:Sequence({
-					J:Tween(castFlashTex, {
-					type = "color", from = {1,0.1,0.1,0}, to = {1,0.1,0.1,0.7}, duration = 0.07,
-					}),
-					J:Tween(castFlashTex, {
-					type = "color", from = {1,0.1,0.1,0.7}, to = {1,0.1,0.1,0}, duration = 0.4,
-					}),
-				}),
-				J:Tween(castFrame, {
-					type = "custom", from = 0, to = 0, duration = 0.01,
-					setter = function()
-					castBar:SetStatusBarColor(1, 0.2, 0.2)
-					--castLabel:SetText("Interrupted!")
-					end,
-				}),
-				J:Delay(0.8),
-				J:FadeOut(castFrame, 0.3),
-				J:Stop(),
-				}),
-			})
+			DEFAULT_CHAT_FRAME:AddMessage("TEST")
+			btn = getglobal("PandaDEFrameDEButton" .. ClickedDEButton)
+			Panda_BlackholeStop(btn)
+			btnicon = getglobal("PandaDEFrameDEButton"..ClickedDEButton.."Icon");	
+			Panda_ShatterReset(btnicon)
 			ClickedDEButton = 0;
 		end
 	elseif (event=="BAG_UPDATE") then
@@ -217,7 +179,9 @@ function PandaDEFrame_Update()
 		index = (scrollOffset) + i;
 		if index <= PA_DENumItems then
 			button:Show()
+			button:SetAlpha(1)
 			color = PA_GetColor(PA_DEItemList[index].rarity)
+			buttonicon:Show()
 			buttonicon:SetTexture(PA_DEItemList[index].icon)
 			buttontxt:SetText(color .. PA_DEItemList[index].name)
 		else
