@@ -235,19 +235,23 @@ function Panda_BlackholeStop(targetFrame)
         local speed = 60 + math.random() * 400
         local vx = math.cos(rad) * speed
         local vy = math.sin(rad) * speed
-        pf:ClearAllPoints();
-        pf:SetPoint("CENTER", targetFrame, "CENTER")
+        --pf:ClearAllPoints();
+        --pf:SetPoint("CENTER", targetFrame, "CENTER")
+        tex:SetTexture(
+            math.min(.92-(0.2*math.random())),
+            math.min(.98-(0.1*math.random())),
+            math.min(.44-(0.1*math.random())), 1)
         J:Sequence({
         J:Tween(pf, {
             --type = "position", from = {x-400, y-500}, to = {x-400, -50},
-            type = "position", to = {0,-50},
-            duration = 0.2 + math.random() * 0.3, easing = "linear",
+            type = "position", to = {-64*math.random()+32,-16*math.random()},
+            duration = 0.1 + math.random() * 0.2, easing = "linear",
             onStart = function() pf:SetAlpha(1); pf:Show() end,
             onFinish = function()
                 pf:Hide()
             end
         }),
-        J:FadeTo(pf, 0, dur * 0.3, "inQuad", { delay = dur * 0.7 }),
+        J:FadeTo(pf, 0, dur * 0.15, "inQuad", { delay = dur * 0.35 }),
         --J:Group({
         -- Ballistic: parabolic trajectory with gravity pulling particles down.
         -- Uses the custom "ballistic" type registered in 01_custom_types.lua.

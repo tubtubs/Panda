@@ -12,10 +12,10 @@ Init System [CHECK]
 Query inventory [CHECK]
 -tooltips [CHECK?]
 Onclick function [CHECK]
-Casting Bar appearance -> might be overrated
 BoP filtering - managed to scan it with tooltips [CHECK]
 Blacklisting - probably manageable [CHECK]
 Make window movable[CHECK]
+Animations
 Need to be able to reset window position
 -Slash command
 -Minimap Icon Menu
