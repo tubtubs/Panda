@@ -134,6 +134,64 @@
             </OnShow>
         </Scripts>
     </Button>
+    <Button name="PandaButtonTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="100" y="22" />
+        </Size>
+        <NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
+            <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+        </NormalTexture>
+        <PushedTexture file="Interface\Buttons\UI-Panel-Button-Down">
+            <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+        </PushedTexture>
+        <DisabledTexture file="Interface\Buttons\UI-Panel-Button-Disabled">
+            <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+        </DisabledTexture>
+        <HighlightTexture file="Interface\Buttons\UI-Panel-Button-Highlight" alphaMode="ADD">
+            <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+        </HighlightTexture>
+        <ButtonText name="$parentText">
+            <FontHeight>
+                <AbsValue val="10" />
+            </FontHeight>
+        </ButtonText>
+        <NormalFont inherits="GameFontNormal">
+            <FontHeight>
+                <AbsValue val="12" />
+            </FontHeight>
+            <Color r="1" g="0.8196079" b="0" />
+            <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                    <AbsDimension x="1" y="-1" />
+                </Offset>
+            </Shadow>
+        </NormalFont>
+        <HighlightFont inherits="GameFontHighlight">
+            <FontHeight>
+                <AbsValue val="12" />
+            </FontHeight>
+            <Color r="1" g="1" b="1" />
+            <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                    <AbsDimension x="1" y="-1" />
+                </Offset>
+            </Shadow>
+        </HighlightFont>
+        <DisabledFont inherits="GameFontDisable">
+            <FontHeight>
+                <AbsValue val="12" />
+            </FontHeight>
+            <Color r="0.4980392" g="0.4980392" b="0.4980392" />
+            <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                    <AbsDimension x="1" y="-1" />
+                </Offset>
+            </Shadow>
+        </DisabledFont>
+    </Button>
     <Frame name="PandaCastFrameTemplate" virtual="true">
         <Size>
             <AbsDimension x="36" y="36"/>
@@ -797,39 +855,23 @@
                     </OnLeave>
                 </Scripts>
             </CheckButton>
-            <Frame name="$parentQualityThresholdDropdown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+            <Button name="$parentQualityThresholdDropdown" text="Blacklisted Qualities" inherits="PandaButtonTemplate" enableMouse="true">
+                <Size>
+                    <AbsDimension x="138" y="22" />
+                </Size>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="$parentBOPFilterCheckButton">
                         <Offset>
-                            <AbsDimension x="180" y="-28"/>
+                            <AbsDimension x="175" y="-28"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND">
-                        <FontString name="$parentLabel" inherits="GameFontHighlightSmallOutline" text="Quality threshold:">
-                            <Anchors>
-                                <Anchor point="CENTER" relativePoint="TOP">
-                                    <Offset>
-                                        <AbsDimension x="0" y="9"/>
-                                    </Offset>
-                                </Anchor>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
-                </Layers>
                 <Scripts>
-                    <OnLoad>
-                            PandaDEFrameQualityThresholdDropdown_OnLoad();
-                    </OnLoad>
-                    <OnEnter>
-                    <OnShow>
-                    </OnShow>
-                    </OnEnter>
-                    <OnLeave>
-                    </OnLeave>
+                    <OnClick>
+                    PandaDEFrameQualityThresholdDropdown_OnClick()
+                    </OnClick>
                 </Scripts>
-            </Frame>
+            </Button>
         </Frames>
         <Scripts>
             <OnShow>

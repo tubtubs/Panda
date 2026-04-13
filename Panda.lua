@@ -15,10 +15,13 @@ Onclick function [CHECK]
 BoP filtering - managed to scan it with tooltips [CHECK]
 Blacklisting - probably manageable [CHECK]
 Make window movable[CHECK]
-Animations
-Need to be able to reset window position
+Animations [CHECK]
+Need to be able to reset window position [CHECK]
 -Slash command
 -Minimap Icon Menu
+OPTIONS
+-Reset Blacklisted Items
+-Hide/Show Minimap Icon
 
 ANIMATION IDEAS:
 Shatter the item icon (/jkt shatter)
@@ -42,7 +45,7 @@ function PandaBorder_OnEvent()
 					BoP_toggle = false,
 					BlackList_toggle = false,
 					Blacklist = {},
-					QualityThreshold = PA_DEFAULT_RARITY
+					QualityBlacklist = {}
 				},
 				hideMinimapIcon = false,
 			}
@@ -54,6 +57,7 @@ function PandaBorder_OnEvent()
         end
 		PA_MinimapIconRegister()
 		PA_MinimapDewdropRegister()
+		PA_QualityDewdropRegister()
 
 	elseif (event=="SPELLCAST_START") then
 		if (arg1 == "Disenchant" and ClickedDEButton ~=0) then
@@ -165,6 +169,104 @@ function PA_MinimapDewdropRegister()
             'dontHook', true
         )
     end
+end
+
+function PandaBlackListQuality(quality)
+	found = -1
+	for i,j in ipairs(PA_Vars.DE_Filters.QualityBlacklist) do
+		if tonumber(quality) == tonumber(j) then
+			found = i
+		end
+	end
+	if found == -1 then
+		table.insert(PA_Vars.DE_Filters.QualityBlacklist,quality)
+	else
+		table.remove(PA_Vars.DE_Filters.QualityBlacklist,found)
+	end
+	PandaDEFrame_Update()
+end
+
+function PandaDEFrameQualityThresholdDropdown_OnClick()
+	if PA_Dewdrop:IsOpen() then
+		PA_Dewdrop:Close()
+	else
+		PA_Dewdrop:Open(this)
+	end
+end
+
+PA_QualityMenu=
+{
+    {
+        text = PA_RARITY["uncommon"].name,
+        tooltipTitle =  "Blacklist Rarity:",
+        tooltipText =  PA_RARITY["uncommon"].name,
+        func = PandaBlackListQuality,
+		arg1 = PA_RARITY["uncommon"].value,
+        value=PA_RARITY["uncommon"].value,
+        hasArrow=false
+    },
+    {
+        text = PA_RARITY["rare"].name,
+        tooltipTitle =  "Blacklist Rarity:",
+        tooltipText =  PA_RARITY["rare"].name,
+        func = PandaBlackListQuality,
+		arg1 = PA_RARITY["rare"].value,
+        value=PA_RARITY["rare"].value,
+        hasArrow=false
+    },
+	{
+        text = PA_RARITY["epic"].name,
+        tooltipTitle =  "Blacklist Rarity:",
+        tooltipText =  PA_RARITY["epic"].name,
+        func = PandaBlackListQuality,
+		arg1 = PA_RARITY["epic"].value,
+        value=PA_RARITY["epic"].value,
+        hasArrow=false
+    }
+}	
+function PA_QualityDewdropRegister()
+	PA_Dewdrop:Register(PandaDEFrameQualityThresholdDropdown, --Bound Frame
+		'point', function(parent) --Point
+			return "TOP", "BOTTOM"
+		end,
+		'children', function(level, value) --Children
+			if level == 1 then
+				for i,j in ipairs(PA_QualityMenu) do
+					chk = false
+					for k,l in ipairs(PA_Vars.DE_Filters.QualityBlacklist) do
+						if j.arg1 == l then
+							chk = true
+						end
+					end
+					PA_Dewdrop:AddLine(
+						'text', j.text,
+						'tooltipTitle', j.tooltipTitle,
+						'tooltipText', j.tooltipText,  
+						'textR', 1,
+						'textG', 0.82,
+						'textB', 0,
+						'func', j.func,
+						'arg1', j.arg1,
+						'hasArrow', j.hasArrow,
+						'value', j.value,
+						'notCheckable', false,
+						'checked', chk
+					)
+				end
+
+				--Close button
+				PA_Dewdrop:AddLine(
+					'text' , "Close Menu",
+					'textR', 0,
+					'textG', 1,
+					'textB', 1,
+					'func' , function() PA_Dewdrop:Close() end,
+					'notCheckable', true
+				)
+			end
+		end,
+		'dontHook', true
+	)
 end
 
 --=UI Code=--
@@ -306,18 +408,28 @@ function Panda_GetAllItemsFromBag()
 					if (found == 0 and itemEquipLoc~= "" and itemEquipLoc~= "INVTYPE_TABARD" and itemEquipLoc~= "INVTYPE_BODY" 
 					and itemEquipLoc~= "INVTYPE_BAG" and itemEquipLoc~= "INVTYPE_QUIVER"
 					and itemEquipLoc~= "INVTYPE_AMMO" ) then
-						if tonumber(PA_Vars.DE_Filters.QualityThreshold) <= quality
-							and tonumber(PA_RARITY["common"].value) < quality
+						if tonumber(PA_RARITY["common"].value) < quality
 							and quality ~= tonumber(PA_RARITY["legendary"].value) then
-						info = {
-							bag = slot,
-							slot = index,
-							id = itemID, 
-							name = itemName,
-							icon = texture,
-							rarity = quality,
-						}
-						table.insert(PA_DEItemList, info)
+							found = -1
+							for i,j in ipairs(PA_Vars.DE_Filters.QualityBlacklist) do
+								--DEFAULT_CHAT_FRAME:AddMessage(format("quali %s %s", quality, j))
+								if tonumber(quality) == tonumber(j) then
+									--DEFAULT_CHAT_FRAME:AddMessage("Yep")
+									found = 1
+								end
+							end
+							--DEFAULT_CHAT_FRAME:AddMessage(format("found %s", found))
+							if found ==-1 then
+								info = {
+									bag = slot,
+									slot = index,
+									id = itemID, 
+									name = itemName,
+									icon = texture,
+									rarity = quality,
+								}
+								table.insert(PA_DEItemList, info)
+							end
 						--DEFAULT_CHAT_FRAME:AddMessage(format("itemID: %s itemName: %s itemType: %s itemSubType: %s quality: %s texture: %s", itemID, itemName, itemType, itemEquipLoc, quality, texture))
 						end
 					end
@@ -327,60 +439,6 @@ function Panda_GetAllItemsFromBag()
 		end
 	end
 	--DEFAULT_CHAT_FRAME:AddMessage(format("Size: %s", getn(PA_DEItemList)))
-end
-
-function PandaDEFrameQualityThresholdDropdown_OnLoad()
-    UIDropDownMenu_Initialize(this, PandaDEFrameQualityThresholdDropdown_Initialize);
-	--if (PA_Vars) then --if its first run just load the default rarity
-    --	UIDropDownMenu_SetSelectedValue(this,PA_Vars.DE_Filters.QualityThreshold)
-	--else
-	--	UIDropDownMenu_SetSelectedValue(this,PA_DEFAULT_RARITY)
-	--end
-	UIDropDownMenu_SetWidth(90, PandaDEFrameQualityThresholdDropdown);
-end
-
-function PandaDEFrameQualityThresholdDropdown_Initialize()
-	--local selectedValue = UIDropDownMenu_GetSelectedValue(PandaDEFrameQualityThresholdDropdown);
-	--if (PA_Vars) then --if its first run just load the default rarity
-    --	selectedValue = PA_Vars.DE_Filters.QualityThreshold
-	--else
-	--	selectedValue = PA_DEFAULT_RARITY
-	--end
-	
-	local info;
-
-	info = {};
-	info.text = PA_RARITY["uncommon"].name;
-	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
-	info.value = PA_RARITY["uncommon"].value
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	end
-	UIDropDownMenu_AddButton(info);
-
-	info = {};
-	info.text = PA_RARITY["rare"].name
-	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
-	info.value = PA_RARITY["rare"].value
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	end
-	UIDropDownMenu_AddButton(info);
-
-	info = {};
-	info.text = PA_RARITY["epic"].name
-	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
-	info.value = PA_RARITY["epic"].value
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	end
-	UIDropDownMenu_AddButton(info);
-end
-
-function PandaDEFrameQualityThresholdDropdown_OnClick()
-    UIDropDownMenu_SetSelectedValue(PandaDEFrameQualityThresholdDropdown, this.value);
-	PA_Vars.DE_Filters.QualityThreshold = this.value;
-	PandaDEFrame_Update() -- going to need to update buttons after changing threshold
 end
 
 function PandaDEFrame_OnShow()
@@ -398,9 +456,6 @@ function PandaDEFrame_OnShow()
 		PandaDEFrameBlacklistFilterCheckButton:SetChecked(0)
 	end
 	--Rarity threshold
-	UIDropDownMenu_Initialize(this, PandaDEFrameQualityThresholdDropdown_Initialize);
-	UIDropDownMenu_SetSelectedValue(PandaDEFrameQualityThresholdDropdown, PA_Vars.DE_Filters.QualityThreshold)
-	UIDropDownMenu_SetWidth(90, PandaDEFrameQualityThresholdDropdown);
 	PandaDEFrame_Update()
 end
 
