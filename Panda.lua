@@ -29,6 +29,7 @@ Purple firework effects along with the flashing background
 ]]--
 local libIcon = LibStub("LibDBIcon-1.0");
 local libData = LibStub("LibDataBroker-1.1");
+local PA_Dewdrop = AceLibrary("Dewdrop-2.0");
 local ClickedDEButton = 0;
 local J = jKwery
 
@@ -52,6 +53,7 @@ function PandaBorder_OnEvent()
             };
         end
 		PA_MinimapIconRegister()
+		PA_MinimapDewdropRegister()
 
 	elseif (event=="SPELLCAST_START") then
 		if (arg1 == "Disenchant" and ClickedDEButton ~=0) then
@@ -68,7 +70,7 @@ function PandaBorder_OnEvent()
 		end
 	elseif (event=="SPELLCAST_INTERRUPTED") then
 		if ClickedDEButton ~= 0 then
-			DEFAULT_CHAT_FRAME:AddMessage("TEST")
+			--DEFAULT_CHAT_FRAME:AddMessage("TEST")
 			btn = getglobal("PandaDEFrameDEButton" .. ClickedDEButton)
 			Panda_BlackholeStop(btn)
 			btnicon = getglobal("PandaDEFrameDEButton"..ClickedDEButton.."Icon");	
@@ -82,25 +84,87 @@ function PandaBorder_OnEvent()
 	end
 end
 
-
-
 --Minimap Button Setup
 function PA_MinimapIconRegister()
-    local iconData = libData:NewDataObject("Panda icon data", {
-        OnClick = function()
-            if PandaBorder:IsShown() then
-                PandaBorder:Hide();
-            else
-                PandaBorder:Show();
-            end
-        end,
-        OnTooltipShow = function(tooltip)
-            tooltip:SetText(PA_FULLNAME);
-        end,
-        icon = [[Interface\Addons\Panda\Assets\Panda.blp]]
-    });
+	if not Panda_Icon.hide then
+		local iconData = libData:NewDataObject("Panda icon data", {
+			OnClick = function()
+				if PA_Dewdrop:IsOpen() then
+					PA_Dewdrop:Close();
+				else
+					PA_Dewdrop:Open(this);
+				end
+			end,
+			OnTooltipShow = function(tooltip)
+				tooltip:SetText(PA_FULLNAME);
+			end,
+			icon = [[Interface\Addons\Panda\Assets\Panda.blp]]
+		});
 
-    libIcon:Register("Panda icon", iconData, Panda_Icon);
+		libIcon:Register("Panda icon", iconData, Panda_Icon);
+	end
+end
+
+--DropdownSetup
+PA_Menu=
+{
+    {
+        text = "Open Window",
+        tooltipTitle =  "Open Window",
+        tooltipText =  "Opens the Panda window",
+        func =  function() 
+            PandaBorder:Show()
+            PA_Dewdrop:Close()
+        end,
+        value=nil,
+        hasArrow=false
+    },
+    {
+        text = "Reset Window",
+        tooltipTitle = "Reset Window",
+        tooltipText = "Resets the MorphHelper window's position",
+        func =  function() PandaResetWindow() PA_Dewdrop:Close() end,
+        value=nil,
+        hasArrow=false
+    }
+}	
+function PA_MinimapDewdropRegister()
+    if not Panda_Icon.hide then
+        PA_Dewdrop:Register(libIcon:GetMinimapButton("Panda icon"), --Bound Frame
+            'point', function(parent) --Point
+                return "TOP", "BOTTOM"
+            end,
+            'children', function(level, value) --Children
+                if level == 1 then
+                    for i,j in ipairs(PA_Menu) do
+                            PA_Dewdrop:AddLine(
+                                'text', j.text,
+                                'tooltipTitle', j.tooltipTitle,
+                                'tooltipText', j.tooltipText,  
+                                'textR', 1,
+                                'textG', 0.82,
+                                'textB', 0,
+                                'func', j.func,
+                                'hasArrow', j.hasArrow,
+                                'value', j.value,
+                                'notCheckable', true
+                            )
+                    end
+
+                    --Close button
+                    PA_Dewdrop:AddLine(
+                        'text' , "Close Menu",
+                        'textR', 0,
+                        'textG', 1,
+                        'textB', 1,
+                        'func' , function() PA_Dewdrop:Close() end,
+                        'notCheckable', true
+                    )
+                end
+            end,
+            'dontHook', true
+        )
+    end
 end
 
 --=UI Code=--
@@ -455,20 +519,46 @@ function PandaDEFrameBlackListButton_UnBlackList()
 	end
 end
 
+function PandaResetWindow()
+    PandaBorder:ClearAllPoints()
+    PandaBorder:SetPoint("CENTER", UIParent ,"CENTER", 0, 0)
+end
+
+function PandaMinimapHide()
+    Panda_Icon.hide = true
+    libIcon:Hide("Panda icon")
+end
+
+function PandaMinimapShow()
+	Panda_Icon.hide = false
+	if (libIcon:GetMinimapButton("Panda icon")) then
+		libIcon:Show("Panda icon")
+	else
+        PA_MinimapIconRegister()
+        PA_MinimapDewdropRegister()
+	end
+end
+
 --Slash command setup
 SLASH_PANDA1 = '/Panda'
 SLASH_PANDA2 = '/Pa'
 PA_OPT1 = "show"
 PA_OPT2 = "options"
+PA_OPT3 = "resetwindow"
+PA_OPT4 = "minimap"
 
-PA_HELP0 = "|cFF00FF00" .. PA_NAME .. ":|r This is the help topic for |cFFFFFF00".. SLASH_PANDA1 .. " " ..
+PA_HELP0 = "|cFF00FF00" .. PA_NAME .. ":|r This is the help topic for " .. PA_NAME .. " |cFFFFFF00".. SLASH_PANDA1 .. " " ..
                     SLASH_PANDA2  .. ".|r\n"
 PA_HELP1 = "|cFFFFFF00 " ..SLASH_PANDA2.. " " .. PA_OPT1 ..
-"|r - Shows the morph helper window.\n"
+"|r - Shows the " .. PA_NAME .. " window.\n"
 PA_HELP2 = "|cFFFFFF00 " ..SLASH_PANDA2.. " " .. PA_OPT2 ..
-"|r - Shows the morph helper window.\n"
+"|r - Shows the " .. PA_NAME .. " options window.\n"
+PA_HELP3 = "|cFFFFFF00 " ..SLASH_PANDA2.. " " .. PA_OPT3 ..
+"|r - Resets the " .. PA_NAME .. " window.\n"
+PA_HELP4 = "|cFFFFFF00 " ..SLASH_PANDA2.. " " .. PA_OPT4 ..
+" {show/hide}|r - Shows or hides the " .. PA_NAME .. " minimap icon.\n"
 
-PA_HELP = PA_HELP0 .. PA_HELP1 .. PA_HELP2
+PA_HELP = PA_HELP0 .. PA_HELP1 .. PA_HELP2 .. PA_HELP3 .. PA_HELP4
 PA_SLASHUNKNOWN = "|cFF00FF00".. PA_NAME .. ":|r unknown command. Type" ..SLASH_PANDA1 .. " for commands"
 
 
@@ -484,6 +574,12 @@ local function TextMenu(arg)
     elseif  arg == PA_OPT2 then
         PandaOptionsFrame:Show()
         PandaDEFrame:Hide()
+	elseif  arg == PA_OPT3 then
+		PandaResetWindow()
+	elseif arg == PA_OPT4 .. " hide" then
+		PandaMinimapHide()
+	elseif arg == PA_OPT4 .. " show" then
+		PandaMinimapShow()
     else
         DEFAULT_CHAT_FRAME:AddMessage(PA_SLASHUNKNOWN,1,0.3,0.3)
     end

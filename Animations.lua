@@ -228,7 +228,7 @@ function Panda_BlackholeStop(targetFrame)
         y = pf:GetTop()
         tex = particles_txt[i]
         --tex:SetTexture(1-math.random()*0.2, 1, 0.35+math.random()*0.35,1)
-        DEFAULT_CHAT_FRAME:AddMessage(format("X: %s Y: %s", x, y))
+        --DEFAULT_CHAT_FRAME:AddMessage(format("X: %s Y: %s", x, y))
         J:Stop(pf)
         local angle = -math.random() * 180
         local rad = math.rad(angle)

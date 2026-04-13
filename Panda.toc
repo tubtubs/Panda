@@ -10,6 +10,8 @@
 ## LoadOnDemand: 0
 ## SavedVariables: PA_Vars, Panda_Icon
 libs\jKwery-0.0.6.lua
+libs\AceLibrary.lua
+libs\Dewdrop-2.0.lua
 libs\LibStub.lua
 libs\AceCore-3.0.lua
 libs\AceHook-3.0.lua
