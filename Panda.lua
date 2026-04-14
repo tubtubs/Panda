@@ -7,21 +7,8 @@
 * Click on the minimap icon, or type /panda to learn more
 
 TODO:
-Minimap Icon [CHECK]
-Init System [CHECK]
-Query inventory [CHECK]
--tooltips [CHECK?]
-Onclick function [CHECK]
-BoP filtering - managed to scan it with tooltips [CHECK]
-Blacklisting - probably manageable [CHECK]
-Make window movable[CHECK]
-Animations [CHECK]
-Need to be able to reset window position [CHECK]
--Slash command
--Minimap Icon Menu
-OPTIONS
--Reset Blacklisted Items
--Hide/Show Minimap Icon
+Try to predict which kind of disenchant material it will be
+List of DE mats on the right hand side, with icons and quantities?
 
 ANIMATION IDEAS:
 Shatter the item icon (/jkt shatter)
@@ -574,6 +561,41 @@ function PandaDEFrameBlackListButton_UnBlackList()
 	end
 end
 
+-- Options Panel
+
+function PandaOptionsFrame_OnShow()
+	if Panda_Icon.hide then
+		PandaOptionsFrame_MinimapToggleButton:SetChecked(0)
+	else
+		PandaOptionsFrame_MinimapToggleButton:SetChecked(1)
+	end
+end
+
+function PandaOptionsFrame_MinimapToggleButton_OnClick()
+	if Panda_Icon.hide then
+		PandaMinimapShow()
+	else
+		PandaMinimapHide()
+	end
+end
+
+function PandaOptionsFrame_BlacklistedItemsReset_OnClick()
+	StaticPopupDialogs["PANDA_RESET_BLACKLIST_CONFIRMATION"] = {
+	text = PA_BLACKLISTRESET_CONFIRMATION,
+	button1 = "Yes",
+	button2 = "No",
+	OnAccept = function()
+		PA_Vars.DE_Filters.Blacklist = {}
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+	preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
+	}
+	StaticPopup_Show("PANDA_RESET_BLACKLIST_CONFIRMATION")
+end
+
+-- Options helpers
 function PandaResetWindow()
     PandaBorder:ClearAllPoints()
     PandaBorder:SetPoint("CENTER", UIParent ,"CENTER", 0, 0)

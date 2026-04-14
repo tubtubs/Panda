@@ -789,7 +789,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="OVERLAY">
-                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="Filter out Bind on Pickup items">
+                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="PA_BOPFILTER_TOOLTIP">
                             <Size>
                                 <AbsDimension x="200" y="10"/>
                             </Size>
@@ -827,7 +827,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="OVERLAY">
-                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="Filter out Blacklisted Items">
+                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="PA_BLACKLISTFILTER_TOOLTIP">
                             <Size>
                                 <AbsDimension x="200" y="10"/>
                             </Size>
@@ -855,7 +855,7 @@
                     </OnLeave>
                 </Scripts>
             </CheckButton>
-            <Button name="$parentQualityThresholdDropdown" text="Blacklisted Qualities" inherits="PandaButtonTemplate" enableMouse="true">
+            <Button name="$parentQualityThresholdDropdown" text="PA_BLACKLISTQUALITIES_TOOLTIP" inherits="PandaButtonTemplate" enableMouse="true">
                 <Size>
                     <AbsDimension x="138" y="22" />
                 </Size>
@@ -963,11 +963,71 @@
             </Layer>
         </Layers>
         <Frames>
-
+            <CheckButton name="$parent_MinimapToggleButton" inherits="OptionsCheckButtonTemplate" checked="false">
+                <Size>
+                    <AbsDimension x="22" y="22" />
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent">
+                        <Offset>
+                            <AbsDimension x="22" y="-75"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                <Layer level="BACKGROUND">
+                    <FontString name="$parentTitle" justifyH="LEFT" font="GameFontNormal" text="PA_MINIMAPTOGGLE_TOOLTIP">
+                        <Size>
+                            <AbsDimension x="120" y="0" />
+                        </Size>
+                        <Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="20" y="-4" />
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <FontHeight>
+                            <AbsValue val="14" />
+                        </FontHeight>
+                        <Color r="1" g="0.8196079" b="0" />
+                        <Shadow>
+                            <Color r="0" g="0" b="0" />
+                            <Offset>
+                                <AbsDimension x="1" y="-1" />
+                            </Offset>
+                        </Shadow>
+                    </FontString>
+                </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                    PandaOptionsFrame_MinimapToggleButton_OnClick()
+					</OnClick>
+                </Scripts>
+            </CheckButton>
+            <Button name="$parent_BlacklistedItemsReset" text="PA_BLACKLISTRESET_TOOLTIP" inherits="PandaButtonTemplate" enableMouse="true">
+                <Size>
+                    <AbsDimension x="155" y="22" />
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent_MinimapToggleButton">
+                        <Offset>
+                            <AbsDimension x="0" y="-28"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                    PandaOptionsFrame_BlacklistedItemsReset_OnClick()
+                    </OnClick>
+                </Scripts>
+            </Button>
         </Frames>
         <Scripts>
             <OnShow>
                 PandaPanel_OnShow()
+                PandaOptionsFrame_OnShow()
             </OnShow>
             <OnLoad>
             </OnLoad>
