@@ -134,6 +134,129 @@
             </OnShow>
         </Scripts>
     </Button>
+    <Button name="PandaButtonTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="100" y="22" />
+        </Size>
+        <NormalTexture file="Interface\Buttons\UI-Panel-Button-Up">
+            <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+        </NormalTexture>
+        <PushedTexture file="Interface\Buttons\UI-Panel-Button-Down">
+            <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+        </PushedTexture>
+        <DisabledTexture file="Interface\Buttons\UI-Panel-Button-Disabled">
+            <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+        </DisabledTexture>
+        <HighlightTexture file="Interface\Buttons\UI-Panel-Button-Highlight" alphaMode="ADD">
+            <TexCoords left="0" right="0.625" top="0" bottom="0.6875" />
+        </HighlightTexture>
+        <ButtonText name="$parentText">
+            <FontHeight>
+                <AbsValue val="10" />
+            </FontHeight>
+        </ButtonText>
+        <NormalFont inherits="GameFontNormal">
+            <FontHeight>
+                <AbsValue val="12" />
+            </FontHeight>
+            <Color r="1" g="0.8196079" b="0" />
+            <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                    <AbsDimension x="1" y="-1" />
+                </Offset>
+            </Shadow>
+        </NormalFont>
+        <HighlightFont inherits="GameFontHighlight">
+            <FontHeight>
+                <AbsValue val="12" />
+            </FontHeight>
+            <Color r="1" g="1" b="1" />
+            <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                    <AbsDimension x="1" y="-1" />
+                </Offset>
+            </Shadow>
+        </HighlightFont>
+        <DisabledFont inherits="GameFontDisable">
+            <FontHeight>
+                <AbsValue val="12" />
+            </FontHeight>
+            <Color r="0.4980392" g="0.4980392" b="0.4980392" />
+            <Shadow>
+                <Color r="0" g="0" b="0" />
+                <Offset>
+                    <AbsDimension x="1" y="-1" />
+                </Offset>
+            </Shadow>
+        </DisabledFont>
+    </Button>
+    <Frame name="PandaCastFrameTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="36" y="36"/>
+        </Size>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parent_BackText">
+                    <Color r="0.08" g="0.08" b="0.08" a="0.9" />
+                    <Size>
+                        <AbsDimension x="36" y="10"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                        <Anchor point="BOTTOMRIGHT">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <Texture name="$parent_OverText">
+                    <Color r="1" g="1" b="1" a="0" />
+                    <Size>
+                        <AbsDimension x="356" y="10"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                        <Anchor point="BOTTOMRIGHT">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Frames>
+            <StatusBar name="$parent_StatusBar" minValue="0" maxValue="100" defaultValue="0">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="2" y="-2"/>
+                        </Offset>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT">
+                        <Offset>
+                            <AbsDimension x="-2" y="2"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <BarTexture file="Interface\Buttons\WHITE8X8" />
+                <BarColor r="0.3" g="0.6" b="1" />
+            </StatusBar>
+        </Frames>
+    </Frame>
     <Button name="PandaDEButtonTemplate" virtual="true">
         <Size>
             <AbsDimension x="36" y="36"/>
@@ -193,7 +316,7 @@
             </OnClick>
             <OnMouseDown>
                 PandaDEButton_OnMouseDown()
-			</OnMouseDown>
+            </OnMouseDown>
         </Scripts>
     </Button>
     <Frame name="PandaBorder" enableMouse="true" toplevel="true" movable="true" parent="UIParent" hidden="true">
@@ -294,12 +417,12 @@
             <OnLoad>
                 tinsert(UISpecialFrames, "PandaBorder");
                 PandaBorder_OnLoad()
-			</OnLoad>
+            </OnLoad>
             <OnShow>
                 PandaBorder_OnShow()
             </OnShow>
             <OnHide>
-			</OnHide>
+            </OnHide>
             <OnEvent>
                 PandaBorder_OnEvent()
             </OnEvent>
@@ -361,8 +484,26 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-			</Layer>
+            </Layer>
             <Layer level="OVERLAY">
+                <Texture name="$parentFlash" hidden="true">   
+                    <Color r="1.00" g="0.984" b="0.604" a="0.3" />
+                    <Size>
+                        <AbsDimension x="438" y="583"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="25" y="-80"/>
+                            </Offset>
+                        </Anchor>
+                        <Anchor point="BOTTOMRIGHT">
+                            <Offset>
+                                <AbsDimension x="-45" y="145"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
                 <FontString name="$parentEmptyList" inherits="GameFontHighlightSmallOutline" justifyH="LEFT" text="PA_DEEMPTY_TOOLTIP" hidden="true">
                     <Size>
                         <AbsDimension x="280" y="40"/>
@@ -442,7 +583,7 @@
                 <Scripts>
                     <OnVerticalScroll>
                         <!-- TODO: Create new update method-->
-							FauxScrollFrame_OnVerticalScroll(6, PandaDEFrame_Update);
+                                FauxScrollFrame_OnVerticalScroll(6, PandaDEFrame_Update);
                     </OnVerticalScroll>
                 </Scripts>
             </ScrollFrame>
@@ -500,6 +641,90 @@
                     </Anchor>
                 </Anchors>
             </Button>
+            <Frame name="$parentDECastFrame1" inherits="PandaCastFrameTemplate" hidden="true" id="1">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton1">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentDEButton1">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="$parentDECastFrame2" inherits="PandaCastFrameTemplate" hidden="true" id="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton2">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentDEButton2">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="$parentDECastFrame3" inherits="PandaCastFrameTemplate" hidden="true" id="3">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton3">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentDEButton3">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="$parentDECastFrame4" inherits="PandaCastFrameTemplate" hidden="true" id="4">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton4">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentDEButton4">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="$parentDECastFrame5" inherits="PandaCastFrameTemplate" hidden="true" id="5">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton5">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentDEButton5">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
+            <Frame name="$parentDECastFrame6" inherits="PandaCastFrameTemplate" hidden="true" id="6">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentDEButton6">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentDEButton6">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Frame>
             <Button name="$parentBlackListButton1" inherits="PandaDEBlackListButtonTemplate" id="1" hidden="true">
                 <Anchors>
                     <Anchor point="CENTER" relativeTo="$parentDEButton1">
@@ -554,7 +779,6 @@
                     </Anchor>
                 </Anchors>
             </Button>
-
             <CheckButton name="$parentBOPFilterCheckButton" inherits="OptionsCheckButtonTemplate" checked="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="$parentDEButton6">
@@ -565,7 +789,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="OVERLAY">
-                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="Filter out Bind on Pickup items">
+                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="PA_BOPFILTER_TOOLTIP">
                             <Size>
                                 <AbsDimension x="200" y="10"/>
                             </Size>
@@ -581,16 +805,16 @@
                 </Layers>
                 <Scripts>
                     <OnClick>
-                    PandaDEFrameBOPFilterCheckButton_OnClick()
-					</OnClick>
+                        PandaDEFrameBOPFilterCheckButton_OnClick()
+                    </OnClick>
                     <OnEnter>
-					GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
-					GameTooltip:SetText("");
-					GameTooltip:Show();
-					</OnEnter>
+                        GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
+                        GameTooltip:SetText("");
+                        GameTooltip:Show();
+                    </OnEnter>
                     <OnLeave>
-					GameTooltip:Hide();
-					</OnLeave>
+                        GameTooltip:Hide();
+                    </OnLeave>
                 </Scripts>
             </CheckButton>
             <CheckButton name="$parentBlacklistFilterCheckButton" inherits="OptionsCheckButtonTemplate" checked="true">
@@ -603,7 +827,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="OVERLAY">
-                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="Filter out Blacklisted Items">
+                        <FontString justifyH="LEFT" name="$parentName" inherits="GameFontHighlightSmallOutline" text="PA_BLACKLISTFILTER_TOOLTIP">
                             <Size>
                                 <AbsDimension x="200" y="10"/>
                             </Size>
@@ -619,51 +843,35 @@
                 </Layers>
                 <Scripts>
                     <OnClick>
-                    PandaDEFrameBlackListFilterCheckButton_OnClick()
-					</OnClick>
+                        PandaDEFrameBlackListFilterCheckButton_OnClick()
+                    </OnClick>
                     <OnEnter>
-					GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
-					GameTooltip:SetText("");
-					GameTooltip:Show();
-					</OnEnter>
+                        GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT");
+                        GameTooltip:SetText("");
+                        GameTooltip:Show();
+                    </OnEnter>
                     <OnLeave>
-					GameTooltip:Hide();
-					</OnLeave>
+                        GameTooltip:Hide();
+                    </OnLeave>
                 </Scripts>
             </CheckButton>
-            <Frame name="$parentQualityThresholdDropdown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+            <Button name="$parentQualityThresholdDropdown" text="PA_BLACKLISTQUALITIES_TOOLTIP" inherits="PandaButtonTemplate" enableMouse="true">
+                <Size>
+                    <AbsDimension x="138" y="22" />
+                </Size>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="$parentBOPFilterCheckButton">
                         <Offset>
-                            <AbsDimension x="180" y="-28"/>
+                            <AbsDimension x="175" y="-28"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND">
-                        <FontString name="$parentLabel" inherits="GameFontHighlightSmallOutline" text="Quality threshold:">
-                            <Anchors>
-                                <Anchor point="CENTER" relativePoint="TOP">
-                                    <Offset>
-                                        <AbsDimension x="0" y="9"/>
-                                    </Offset>
-                                </Anchor>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
-                </Layers>
                 <Scripts>
-                    <OnLoad>
-                        PandaDEFrameQualityThresholdDropdown_OnLoad();
-                    </OnLoad>
-                    <OnEnter>
-                        <OnShow>
-                    </OnShow>
-                    </OnEnter>
-                    <OnLeave>
-                    </OnLeave>
+                    <OnClick>
+                    PandaDEFrameQualityThresholdDropdown_OnClick()
+                    </OnClick>
                 </Scripts>
-            </Frame>
+            </Button>
         </Frames>
         <Scripts>
             <OnShow>
@@ -671,9 +879,9 @@
                 PandaDEFrame_OnShow()
             </OnShow>
             <OnLoad>
-			</OnLoad>
+            </OnLoad>
             <OnEvent>
-			</OnEvent>
+            </OnEvent>
             <OnMouseDown>
                 PandaBorder:StartMoving()
             </OnMouseDown>
@@ -738,7 +946,7 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-			</Layer>
+            </Layer>
             <Layer level="OVERLAY">
                 <Texture name="HonorFramePvPIcon">
                     <Size>
@@ -755,16 +963,76 @@
             </Layer>
         </Layers>
         <Frames>
-
-		</Frames>
+            <CheckButton name="$parent_MinimapToggleButton" inherits="OptionsCheckButtonTemplate" checked="false">
+                <Size>
+                    <AbsDimension x="22" y="22" />
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent">
+                        <Offset>
+                            <AbsDimension x="22" y="-75"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                <Layer level="BACKGROUND">
+                    <FontString name="$parentTitle" justifyH="LEFT" font="GameFontNormal" text="PA_MINIMAPTOGGLE_TOOLTIP">
+                        <Size>
+                            <AbsDimension x="120" y="0" />
+                        </Size>
+                        <Anchors>
+                            <Anchor point="TOPLEFT">
+                                <Offset>
+                                    <AbsDimension x="20" y="-4" />
+                                </Offset>
+                            </Anchor>
+                        </Anchors>
+                        <FontHeight>
+                            <AbsValue val="14" />
+                        </FontHeight>
+                        <Color r="1" g="0.8196079" b="0" />
+                        <Shadow>
+                            <Color r="0" g="0" b="0" />
+                            <Offset>
+                                <AbsDimension x="1" y="-1" />
+                            </Offset>
+                        </Shadow>
+                    </FontString>
+                </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                    PandaOptionsFrame_MinimapToggleButton_OnClick()
+					</OnClick>
+                </Scripts>
+            </CheckButton>
+            <Button name="$parent_BlacklistedItemsReset" text="PA_BLACKLISTRESET_TOOLTIP" inherits="PandaButtonTemplate" enableMouse="true">
+                <Size>
+                    <AbsDimension x="155" y="22" />
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent_MinimapToggleButton">
+                        <Offset>
+                            <AbsDimension x="0" y="-28"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                    PandaOptionsFrame_BlacklistedItemsReset_OnClick()
+                    </OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
         <Scripts>
             <OnShow>
                 PandaPanel_OnShow()
+                PandaOptionsFrame_OnShow()
             </OnShow>
             <OnLoad>
-			</OnLoad>
+            </OnLoad>
             <OnEvent>
-			</OnEvent>
+            </OnEvent>
             <OnMouseDown>
                 PandaBorder:StartMoving()
             </OnMouseDown>

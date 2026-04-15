@@ -2,19 +2,20 @@
 ## Title: Panda
 ## Author: |ccf3CE13Ftubtubs 
 ## Version: 0.1
-## Notes: A simple vanilla wow addon that makes quick work of disenchanting.
-## Panda provides an updating window with 1 click disenchant buttons for the equipment in your bags.
-## Includes filters for bind on pickup, and an easy to use blacklist.
-## Click on the minimap icon, or type /panda to learn more
+## Notes: A simple vanilla wow addon that makes quick work of disenchanting. /Panda to learn more. Uses animations from |cffa050ffPizza|cffffffffSauce by PizzaHawaii
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## SavedVariables: PA_Vars, Panda_Icon
+libs\PizzaSauce.lua
+libs\AceLibrary.lua
+libs\Dewdrop-2.0.lua
 libs\LibStub.lua
 libs\AceCore-3.0.lua
 libs\AceHook-3.0.lua
 libs\CallbackHandler-1.0.lua
 libs\LibDataBroker-1.1.lua
 libs\LibDBIcon-1.0.lua
+Animations.lua
 localisation.lua
 Panda.xml
 Panda.lua

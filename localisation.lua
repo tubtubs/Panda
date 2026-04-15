@@ -10,6 +10,12 @@ PA_BLACKLISTBTN_TOOLTIP = "Right click again to blacklist this item.\nLeft click
 PA_UNBLACKLISTBTN_TOOLTIP = "Right click again to unblacklist this item.\nLeft click to cancel."
 PA_DEEMPTY_TOOLTIP = "No equipment found, check filters and inventory."
 PA_DE_TOOLTIP = "Click an item to disenchant.\nRight click an item to blacklist."
+PA_MINIMAPTOGGLE_TOOLTIP = "Show minimap icon"
+PA_BLACKLISTRESET_TOOLTIP = "Reset Blacklisted Items"
+PA_BOPFILTER_TOOLTIP = "Filter out Bind on Pickup items"
+PA_BLACKLISTQUALITIES_TOOLTIP = "Blacklisted Qualities"
+PA_BLACKLISTFILTER_TOOLTIP = "Filter out Blacklisted Items"
+PA_BLACKLISTRESET_CONFIRMATION = "Do you want to reset your blacklisted items?"
 
 PA_RARITY = {
     ["poor"] = {

@@ -5,24 +5,24 @@
 * Panda provides an updating window with 1 click disenchant buttons for the equipment in your bags.
 * Includes filters for bind on pickup, and an easy to use blacklist.
 * Click on the minimap icon, or type /panda to learn more
+* Uses animations from PizzaSauce https://codeberg.org/Pizzahawaii/PizzaSauce by PizzaHawaii
 
 TODO:
-Minimap Icon [CHECK]
-Init System [CHECK]
-Query inventory [CHECK]
--tooltips [CHECK?]
-Onclick function [CHECK]
-Casting Bar appearance -> might be overrated
-BoP filtering - managed to scan it with tooltips [CHECK]
-Blacklisting - probably manageable [CHECK]
-Make window movable[CHECK]
-Need to be able to reset window position
--Slash command
--Minimap Icon Menu
+Try to predict which kind of disenchant material it will be
+List of DE mats on the right hand side, with icons and quantities?
+
+ANIMATION IDEAS:
+Shatter the item icon (/jkt shatter)
+Blackhole effect on them item would be SO DOPE
+Smoke could be cool too
+Purple firework effects along with the flashing background
 
 ]]--
 local libIcon = LibStub("LibDBIcon-1.0");
 local libData = LibStub("LibDataBroker-1.1");
+local PA_Dewdrop = AceLibrary("Dewdrop-2.0");
+local ClickedDEButton = 0;
+local J = PizzaSauce
 
 --Event handler/init
 function PandaBorder_OnEvent()
@@ -33,7 +33,7 @@ function PandaBorder_OnEvent()
 					BoP_toggle = false,
 					BlackList_toggle = false,
 					Blacklist = {},
-					QualityThreshold = PA_DEFAULT_RARITY
+					QualityBlacklist = {}
 				},
 				hideMinimapIcon = false,
 			}
@@ -44,6 +44,31 @@ function PandaBorder_OnEvent()
             };
         end
 		PA_MinimapIconRegister()
+		PA_MinimapDewdropRegister()
+		PA_QualityDewdropRegister()
+
+	elseif (event=="SPELLCAST_START") then
+		if (arg1 == "Disenchant" and ClickedDEButton ~=0) then
+			btn = getglobal("PandaDEFrameDEButton" .. ClickedDEButton)
+			Panda_BlackholeStart(btn)
+			btnicon = getglobal("PandaDEFrameDEButton"..ClickedDEButton.."Icon");	
+			txt = btnicon:GetTexture()
+			Panda_Shatter(btn,btnicon,txt)
+		end
+	elseif (event=="SPELLCAST_STOP") then
+		castFrame = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton)
+		if castFrame and not castFrame:IsShown() then
+			--ClickedDEButton = 0
+		end
+	elseif (event=="SPELLCAST_INTERRUPTED") then
+		if ClickedDEButton ~= 0 then
+			--DEFAULT_CHAT_FRAME:AddMessage("TEST")
+			btn = getglobal("PandaDEFrameDEButton" .. ClickedDEButton)
+			Panda_BlackholeStop(btn)
+			btnicon = getglobal("PandaDEFrameDEButton"..ClickedDEButton.."Icon");	
+			Panda_ShatterReset(btnicon)
+			ClickedDEButton = 0;
+		end
 	elseif (event=="BAG_UPDATE") then
 		if PandaDEFrame:IsShown() then
 			PandaDEFrame_Update()
@@ -51,25 +76,185 @@ function PandaBorder_OnEvent()
 	end
 end
 
-
-
 --Minimap Button Setup
 function PA_MinimapIconRegister()
-    local iconData = libData:NewDataObject("Panda icon data", {
-        OnClick = function()
-            if PandaBorder:IsShown() then
-                PandaBorder:Hide();
-            else
-                PandaBorder:Show();
-            end
-        end,
-        OnTooltipShow = function(tooltip)
-            tooltip:SetText(PA_FULLNAME);
-        end,
-        icon = [[Interface\Addons\Panda\Assets\Panda.blp]]
-    });
+	if not Panda_Icon.hide then
+		local iconData = libData:NewDataObject("Panda icon data", {
+			OnClick = function()
+				if PA_Dewdrop:IsOpen() then
+					PA_Dewdrop:Close();
+				else
+					PA_Dewdrop:Open(this);
+				end
+			end,
+			OnTooltipShow = function(tooltip)
+				tooltip:SetText(PA_FULLNAME);
+			end,
+			icon = [[Interface\Addons\Panda\Assets\Panda.blp]]
+		});
 
-    libIcon:Register("Panda icon", iconData, Panda_Icon);
+		libIcon:Register("Panda icon", iconData, Panda_Icon);
+	end
+end
+
+--DropdownSetup
+PA_Menu=
+{
+    {
+        text = "Open Window",
+        tooltipTitle =  "Open Window",
+        tooltipText =  "Opens the Panda window",
+        func =  function() 
+            PandaBorder:Show()
+            PA_Dewdrop:Close()
+        end,
+        value=nil,
+        hasArrow=false
+    },
+    {
+        text = "Reset Window",
+        tooltipTitle = "Reset Window",
+        tooltipText = "Resets the MorphHelper window's position",
+        func =  function() PandaResetWindow() PA_Dewdrop:Close() end,
+        value=nil,
+        hasArrow=false
+    }
+}	
+function PA_MinimapDewdropRegister()
+    if not Panda_Icon.hide then
+        PA_Dewdrop:Register(libIcon:GetMinimapButton("Panda icon"), --Bound Frame
+            'point', function(parent) --Point
+                return "TOP", "BOTTOM"
+            end,
+            'children', function(level, value) --Children
+                if level == 1 then
+                    for i,j in ipairs(PA_Menu) do
+                            PA_Dewdrop:AddLine(
+                                'text', j.text,
+                                'tooltipTitle', j.tooltipTitle,
+                                'tooltipText', j.tooltipText,  
+                                'textR', 1,
+                                'textG', 0.82,
+                                'textB', 0,
+                                'func', j.func,
+                                'hasArrow', j.hasArrow,
+                                'value', j.value,
+                                'notCheckable', true
+                            )
+                    end
+
+                    --Close button
+                    PA_Dewdrop:AddLine(
+                        'text' , "Close Menu",
+                        'textR', 0,
+                        'textG', 1,
+                        'textB', 1,
+                        'func' , function() PA_Dewdrop:Close() end,
+                        'notCheckable', true
+                    )
+                end
+            end,
+            'dontHook', true
+        )
+    end
+end
+
+function PandaBlackListQuality(quality)
+	found = -1
+	for i,j in ipairs(PA_Vars.DE_Filters.QualityBlacklist) do
+		if tonumber(quality) == tonumber(j) then
+			found = i
+		end
+	end
+	if found == -1 then
+		table.insert(PA_Vars.DE_Filters.QualityBlacklist,quality)
+	else
+		table.remove(PA_Vars.DE_Filters.QualityBlacklist,found)
+	end
+	PandaDEFrame_Update()
+end
+
+function PandaDEFrameQualityThresholdDropdown_OnClick()
+	if PA_Dewdrop:IsOpen() then
+		PA_Dewdrop:Close()
+	else
+		PA_Dewdrop:Open(this)
+	end
+end
+
+PA_QualityMenu=
+{
+    {
+        text = PA_RARITY["uncommon"].name,
+        tooltipTitle =  "Blacklist Rarity:",
+        tooltipText =  PA_RARITY["uncommon"].name,
+        func = PandaBlackListQuality,
+		arg1 = PA_RARITY["uncommon"].value,
+        value=PA_RARITY["uncommon"].value,
+        hasArrow=false
+    },
+    {
+        text = PA_RARITY["rare"].name,
+        tooltipTitle =  "Blacklist Rarity:",
+        tooltipText =  PA_RARITY["rare"].name,
+        func = PandaBlackListQuality,
+		arg1 = PA_RARITY["rare"].value,
+        value=PA_RARITY["rare"].value,
+        hasArrow=false
+    },
+	{
+        text = PA_RARITY["epic"].name,
+        tooltipTitle =  "Blacklist Rarity:",
+        tooltipText =  PA_RARITY["epic"].name,
+        func = PandaBlackListQuality,
+		arg1 = PA_RARITY["epic"].value,
+        value=PA_RARITY["epic"].value,
+        hasArrow=false
+    }
+}	
+function PA_QualityDewdropRegister()
+	PA_Dewdrop:Register(PandaDEFrameQualityThresholdDropdown, --Bound Frame
+		'point', function(parent) --Point
+			return "TOP", "BOTTOM"
+		end,
+		'children', function(level, value) --Children
+			if level == 1 then
+				for i,j in ipairs(PA_QualityMenu) do
+					chk = false
+					for k,l in ipairs(PA_Vars.DE_Filters.QualityBlacklist) do
+						if j.arg1 == l then
+							chk = true
+						end
+					end
+					PA_Dewdrop:AddLine(
+						'text', j.text,
+						'tooltipTitle', j.tooltipTitle,
+						'tooltipText', j.tooltipText,  
+						'textR', 1,
+						'textG', 0.82,
+						'textB', 0,
+						'func', j.func,
+						'arg1', j.arg1,
+						'hasArrow', j.hasArrow,
+						'value', j.value,
+						'notCheckable', false,
+						'checked', chk
+					)
+				end
+
+				--Close button
+				PA_Dewdrop:AddLine(
+					'text' , "Close Menu",
+					'textR', 0,
+					'textG', 1,
+					'textB', 1,
+					'func' , function() PA_Dewdrop:Close() end,
+					'notCheckable', true
+				)
+			end
+		end,
+		'dontHook', true
+	)
 end
 
 --=UI Code=--
@@ -80,10 +265,14 @@ function PandaBorder_OnShow()
 		PandaDEFrame:Show()
 	end
 end
+
 --TabPanel Code
 function PandaBorder_OnLoad()
 	this:RegisterEvent("PLAYER_LOGIN");
 	this:RegisterEvent("BAG_UPDATE");
+	this:RegisterEvent("SPELLCAST_START")
+	this:RegisterEvent("SPELLCAST_STOP")
+	this:RegisterEvent("SPELLCAST_INTERRUPTED")
 
     PanelTemplates_SetNumTabs(this, PA_MAXTABS);
 end
@@ -145,7 +334,9 @@ function PandaDEFrame_Update()
 		index = (scrollOffset) + i;
 		if index <= PA_DENumItems then
 			button:Show()
+			button:SetAlpha(1)
 			color = PA_GetColor(PA_DEItemList[index].rarity)
+			buttonicon:Show()
 			buttonicon:SetTexture(PA_DEItemList[index].icon)
 			buttontxt:SetText(color .. PA_DEItemList[index].name)
 		else
@@ -206,18 +397,28 @@ function Panda_GetAllItemsFromBag()
 					if (found == 0 and itemEquipLoc~= "" and itemEquipLoc~= "INVTYPE_TABARD" and itemEquipLoc~= "INVTYPE_BODY" 
 					and itemEquipLoc~= "INVTYPE_BAG" and itemEquipLoc~= "INVTYPE_QUIVER"
 					and itemEquipLoc~= "INVTYPE_AMMO" ) then
-						if tonumber(PA_Vars.DE_Filters.QualityThreshold) <= quality
-							and tonumber(PA_RARITY["common"].value) < quality
+						if tonumber(PA_RARITY["common"].value) < quality
 							and quality ~= tonumber(PA_RARITY["legendary"].value) then
-						info = {
-							bag = slot,
-							slot = index,
-							id = itemID, 
-							name = itemName,
-							icon = texture,
-							rarity = quality,
-						}
-						table.insert(PA_DEItemList, info)
+							found = -1
+							for i,j in ipairs(PA_Vars.DE_Filters.QualityBlacklist) do
+								--DEFAULT_CHAT_FRAME:AddMessage(format("quali %s %s", quality, j))
+								if tonumber(quality) == tonumber(j) then
+									--DEFAULT_CHAT_FRAME:AddMessage("Yep")
+									found = 1
+								end
+							end
+							--DEFAULT_CHAT_FRAME:AddMessage(format("found %s", found))
+							if found ==-1 then
+								info = {
+									bag = slot,
+									slot = index,
+									id = itemID, 
+									name = itemName,
+									icon = texture,
+									rarity = quality,
+								}
+								table.insert(PA_DEItemList, info)
+							end
 						--DEFAULT_CHAT_FRAME:AddMessage(format("itemID: %s itemName: %s itemType: %s itemSubType: %s quality: %s texture: %s", itemID, itemName, itemType, itemEquipLoc, quality, texture))
 						end
 					end
@@ -227,60 +428,6 @@ function Panda_GetAllItemsFromBag()
 		end
 	end
 	--DEFAULT_CHAT_FRAME:AddMessage(format("Size: %s", getn(PA_DEItemList)))
-end
-
-function PandaDEFrameQualityThresholdDropdown_OnLoad()
-    UIDropDownMenu_Initialize(this, PandaDEFrameQualityThresholdDropdown_Initialize);
-	--if (PA_Vars) then --if its first run just load the default rarity
-    --	UIDropDownMenu_SetSelectedValue(this,PA_Vars.DE_Filters.QualityThreshold)
-	--else
-	--	UIDropDownMenu_SetSelectedValue(this,PA_DEFAULT_RARITY)
-	--end
-	UIDropDownMenu_SetWidth(90, PandaDEFrameQualityThresholdDropdown);
-end
-
-function PandaDEFrameQualityThresholdDropdown_Initialize()
-	--local selectedValue = UIDropDownMenu_GetSelectedValue(PandaDEFrameQualityThresholdDropdown);
-	--if (PA_Vars) then --if its first run just load the default rarity
-    --	selectedValue = PA_Vars.DE_Filters.QualityThreshold
-	--else
-	--	selectedValue = PA_DEFAULT_RARITY
-	--end
-	
-	local info;
-
-	info = {};
-	info.text = PA_RARITY["uncommon"].name;
-	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
-	info.value = PA_RARITY["uncommon"].value
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	end
-	UIDropDownMenu_AddButton(info);
-
-	info = {};
-	info.text = PA_RARITY["rare"].name
-	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
-	info.value = PA_RARITY["rare"].value
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	end
-	UIDropDownMenu_AddButton(info);
-
-	info = {};
-	info.text = PA_RARITY["epic"].name
-	info.func = PandaDEFrameQualityThresholdDropdown_OnClick;
-	info.value = PA_RARITY["epic"].value
-	if ( info.value == selectedValue ) then
-		info.checked = 1;
-	end
-	UIDropDownMenu_AddButton(info);
-end
-
-function PandaDEFrameQualityThresholdDropdown_OnClick()
-    UIDropDownMenu_SetSelectedValue(PandaDEFrameQualityThresholdDropdown, this.value);
-	PA_Vars.DE_Filters.QualityThreshold = this.value;
-	PandaDEFrame_Update() -- going to need to update buttons after changing threshold
 end
 
 function PandaDEFrame_OnShow()
@@ -297,10 +444,6 @@ function PandaDEFrame_OnShow()
 	else
 		PandaDEFrameBlacklistFilterCheckButton:SetChecked(0)
 	end
-	--Rarity threshold
-	UIDropDownMenu_Initialize(this, PandaDEFrameQualityThresholdDropdown_Initialize);
-	UIDropDownMenu_SetSelectedValue(PandaDEFrameQualityThresholdDropdown, PA_Vars.DE_Filters.QualityThreshold)
-	UIDropDownMenu_SetWidth(90, PandaDEFrameQualityThresholdDropdown);
 	PandaDEFrame_Update()
 end
 
@@ -318,6 +461,7 @@ end
 function PandaDEButton_OnClick()
 	local scrollOffset = FauxScrollFrame_GetOffset(PandaDEFrameDEScrollFrame);
 	id = this:GetID()
+	ClickedDEButton = id
 	item = PA_DEItemList[id + scrollOffset]
 	blacklistButton = getglobal("PandaDEFrameBlackListButton"..id)
 	if arg1 == 'LeftButton' then
@@ -418,20 +562,81 @@ function PandaDEFrameBlackListButton_UnBlackList()
 	end
 end
 
+-- Options Panel
+
+function PandaOptionsFrame_OnShow()
+	if Panda_Icon.hide then
+		PandaOptionsFrame_MinimapToggleButton:SetChecked(0)
+	else
+		PandaOptionsFrame_MinimapToggleButton:SetChecked(1)
+	end
+end
+
+function PandaOptionsFrame_MinimapToggleButton_OnClick()
+	if Panda_Icon.hide then
+		PandaMinimapShow()
+	else
+		PandaMinimapHide()
+	end
+end
+
+function PandaOptionsFrame_BlacklistedItemsReset_OnClick()
+	StaticPopupDialogs["PANDA_RESET_BLACKLIST_CONFIRMATION"] = {
+	text = PA_BLACKLISTRESET_CONFIRMATION,
+	button1 = "Yes",
+	button2 = "No",
+	OnAccept = function()
+		PA_Vars.DE_Filters.Blacklist = {}
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+	preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
+	}
+	StaticPopup_Show("PANDA_RESET_BLACKLIST_CONFIRMATION")
+end
+
+-- Options helpers
+function PandaResetWindow()
+    PandaBorder:ClearAllPoints()
+    PandaBorder:SetPoint("CENTER", UIParent ,"CENTER", 0, 0)
+end
+
+function PandaMinimapHide()
+    Panda_Icon.hide = true
+    libIcon:Hide("Panda icon")
+end
+
+function PandaMinimapShow()
+	Panda_Icon.hide = false
+	if (libIcon:GetMinimapButton("Panda icon")) then
+		libIcon:Show("Panda icon")
+	else
+        PA_MinimapIconRegister()
+        PA_MinimapDewdropRegister()
+	end
+end
+
 --Slash command setup
 SLASH_PANDA1 = '/Panda'
 SLASH_PANDA2 = '/Pa'
 PA_OPT1 = "show"
 PA_OPT2 = "options"
+PA_OPT3 = "resetwindow"
+PA_OPT4 = "minimap"
 
-PA_HELP0 = "|cFF00FF00" .. PA_NAME .. ":|r This is the help topic for |cFFFFFF00".. SLASH_PANDA1 .. " " ..
+PA_HELP0 = "|cFF00FF00" .. PA_NAME .. ":|r This is the help topic for " .. PA_NAME .. " |cFFFFFF00".. SLASH_PANDA1 .. " " ..
                     SLASH_PANDA2  .. ".|r\n"
 PA_HELP1 = "|cFFFFFF00 " ..SLASH_PANDA2.. " " .. PA_OPT1 ..
-"|r - Shows the morph helper window.\n"
+"|r - Shows the " .. PA_NAME .. " window.\n"
 PA_HELP2 = "|cFFFFFF00 " ..SLASH_PANDA2.. " " .. PA_OPT2 ..
-"|r - Shows the morph helper window.\n"
+"|r - Shows the " .. PA_NAME .. " options window.\n"
+PA_HELP3 = "|cFFFFFF00 " ..SLASH_PANDA2.. " " .. PA_OPT3 ..
+"|r - Resets the " .. PA_NAME .. " window.\n"
+PA_HELP4 = "|cFFFFFF00 " ..SLASH_PANDA2.. " " .. PA_OPT4 ..
+" {show/hide}|r - Shows or hides the " .. PA_NAME .. " minimap icon.\n"
 
-PA_HELP = PA_HELP0 .. PA_HELP1 .. PA_HELP2
+PA_HELP = PA_HELP0 .. PA_HELP1 .. PA_HELP2 .. PA_HELP3 .. PA_HELP4
 PA_SLASHUNKNOWN = "|cFF00FF00".. PA_NAME .. ":|r unknown command. Type" ..SLASH_PANDA1 .. " for commands"
 
 
@@ -447,6 +652,12 @@ local function TextMenu(arg)
     elseif  arg == PA_OPT2 then
         PandaOptionsFrame:Show()
         PandaDEFrame:Hide()
+	elseif  arg == PA_OPT3 then
+		PandaResetWindow()
+	elseif arg == PA_OPT4 .. " hide" then
+		PandaMinimapHide()
+	elseif arg == PA_OPT4 .. " show" then
+		PandaMinimapShow()
     else
         DEFAULT_CHAT_FRAME:AddMessage(PA_SLASHUNKNOWN,1,0.3,0.3)
     end
