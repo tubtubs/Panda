@@ -5,7 +5,7 @@
 ## Notes: A simple vanilla wow addon that makes quick work of disenchanting. /Panda to learn more. Uses animations from |cffa050ffPizza|cffffffffSauce by PizzaHawaii
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
-## SavedVariables: PA_Vars, Panda_Icon
+## SavedVariablesPerCharacter: PA_Vars, Panda_Icon
 libs\PizzaSauce.lua
 libs\AceLibrary.lua
 libs\Dewdrop-2.0.lua
