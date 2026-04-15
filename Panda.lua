@@ -5,6 +5,7 @@
 * Panda provides an updating window with 1 click disenchant buttons for the equipment in your bags.
 * Includes filters for bind on pickup, and an easy to use blacklist.
 * Click on the minimap icon, or type /panda to learn more
+* Uses animations from PizzaSauce https://codeberg.org/Pizzahawaii/PizzaSauce by PizzaHawaii
 
 TODO:
 Try to predict which kind of disenchant material it will be
@@ -264,6 +265,7 @@ function PandaBorder_OnShow()
 		PandaDEFrame:Show()
 	end
 end
+
 --TabPanel Code
 function PandaBorder_OnLoad()
 	this:RegisterEvent("PLAYER_LOGIN");
@@ -442,7 +444,6 @@ function PandaDEFrame_OnShow()
 	else
 		PandaDEFrameBlacklistFilterCheckButton:SetChecked(0)
 	end
-	--Rarity threshold
 	PandaDEFrame_Update()
 end
 

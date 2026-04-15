@@ -1,6 +1,7 @@
+--Example code from PizzaSauceDemos (https://codeberg.org/Pizzahawaii/PizzaSauceDemos)
 local J = PizzaSauce
---local JKT = jKweryTest
 
+--Helpers/Registered Types copied from demos
 -- =============================================================================
 -- "ballistic" type: Physics-based projectile trajectory
 -- =============================================================================
@@ -216,12 +217,6 @@ function Panda_BlackholeStart(targetFrame)
 end
 
 function Panda_BlackholeStop(targetFrame)
-    --J:Stop(singularity)
-    --J:Stop(singularity)
-    --singularity:Hide()
-    --singularity:SetAlpha(1)
-    --singularity:SetWidth(12)
-    --singularity:SetHeight(12)
     J:Stop(anims)
     -- want to make them fall down a bit before hiding
     local fallingAnims = {}
@@ -232,49 +227,18 @@ function Panda_BlackholeStop(targetFrame)
         x = pf:GetLeft()
         y = pf:GetTop()
         tex = particles_txt[i]
-        --tex:SetTexture(1-math.random()*0.2, 1, 0.35+math.random()*0.35,1)
-        --DEFAULT_CHAT_FRAME:AddMessage(format("X: %s Y: %s", x, y))
-        J:Stop(pf)
-        local angle = -math.random() * 180
-        local rad = math.rad(angle)
-        local speed = 60 + math.random() * 400
-        local vx = math.cos(rad) * speed
-        local vy = math.sin(rad) * speed
-        --pf:ClearAllPoints();
-        --pf:SetPoint("CENTER", targetFrame, "CENTER")
+        x , y = pf:GetCenter()
+
         tex:SetTexture(
             math.min(.92-(0.2*math.random())),
             math.min(.98-(0.1*math.random())),
             math.min(.44-(0.1*math.random())), 1)
         J:Sequence({
-        J:Tween(pf, {
-            --type = "position", from = {x-400, y-500}, to = {x-400, -50},
-            type = "position", to = {-64*math.random()+32,-16*math.random()},
-            duration = 0.1 + math.random() * 0.2, easing = "linear",
-            onStart = function() pf:SetAlpha(1); pf:Show() end,
-            onFinish = function()
-                pf:Hide()
-            end
-        }),
-        J:FadeTo(pf, 0, dur * 0.15, "inQuad", { delay = dur * 0.35 }),
-        --J:Group({
-        -- Ballistic: parabolic trajectory with gravity pulling particles down.
-        -- Uses the custom "ballistic" type registered in 01_custom_types.lua.
-        --J:Ballistic(pf, {0, 0}, dur, vx, vy, gravity, {
-        --  onStart = function() pf:SetAlpha(1); pf:Show() end,
-        --}),
-        -- Fade out near the end of the arc
-        --J:FadeTo(pf, 0, 0.3, "inQuad", { delay = dur - 0.3 }),
-      --}),
+            --J:Ballistic(pf, { x, y }, 3, 0, 0, 300, {
+            --onFinish = function() pf:Hide() end,
+            --}),
+            J:SlideOut(pf, "DOWN", 300, 0.5)
         })
-
-        --particles[i]:Hide()
-        --particles[i]:SetAlpha(1)
-        --local s = 2 + math.random() * 4
-        --particles[i]:SetWidth(s)
-        --particles[i]:SetHeight(s)
-        --particles[i]:ClearAllPoints()
-        --particles[i]:SetPoint("CENTER", UIParent, "CENTER", CENTER_X, CENTER_Y)
     end
 end
 
@@ -397,68 +361,4 @@ function Panda_ShatterReset(targetIcon)
         fragments[i]:ClearAllPoints()
         fragments[i]:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     end
-end
-
--- ** Castbar Stuff ** -- 
-
-function Panda_CastbarStart()
-    castBar = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_StatusBar")
-    castFlashTex = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_OverText")
-    castFrame = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton)
-    castBar:SetValue(0)
-    castBar:SetStatusBarColor(0.3, 0.6, 1)
-    castFlashTex:SetVertexColor(1, 1, 1, 0)
-    --castLabel:SetText(arg1)
-    J:Sequence({
-        J:FadeIn(castFrame, 0.2),
-
-        -- Casts DE for 2.8s, -0.2 for the fade in.
-        J:Progress(castBar, 100, 2.8, "linear"),
-
-        -- Success: green flash then turn bar green
-        J:Group({
-        J:Tween(castFlashTex, {
-            type = "color", from = {0.2,1,0.4,0}, to = {0.2,1,0.4,0.6}, duration = 0.08,
-        }),
-        J:Tween(castFlashTex, {
-            type = "color", from = {0.2,1,0.4,0.6}, to = {0.2,1,0.4,0}, duration = 0.3,
-            onStart = function() castBar:SetStatusBarColor(0.2, 1, 0.4) end,
-        }),
-        }),
-        --J:Delay(0.5),
-        J:FadeIn(PandaDEFrameFlash,0.1),
-        J:ColorFlash(PandaDEFrameFlash, 1, 0.984, 0.329, 0.5),
-        J:FadeOut(PandaDEFrameFlash,0.1),
-        J:FadeOut(castFrame, 0.3),
-    })
-end
-
-
-function Panda_CastbarStop()
-	castBar = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_StatusBar")
-    castFlashTex = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton .."_OverText")
-    castFrame = getglobal("PandaDEFrameDECastFrame".. ClickedDEButton)
-    J:Sequence({
-    -- Interrupt: red flash + shake
-        J:Group({
-        J:Shake(castFrame, 5, 0.4),
-        J:Sequence({
-            J:Tween(castFlashTex, {
-            type = "color", from = {1,0.1,0.1,0}, to = {1,0.1,0.1,0.7}, duration = 0.07,
-            }),
-            J:Tween(castFlashTex, {
-            type = "color", from = {1,0.1,0.1,0.7}, to = {1,0.1,0.1,0}, duration = 0.4,
-            }),
-        }),
-        J:Tween(castFrame, {
-            type = "custom", from = 0, to = 0, duration = 0.01,
-            setter = function()
-            castBar:SetStatusBarColor(1, 0.2, 0.2)
-            end,
-        }),
-        J:Delay(0.8),
-        J:FadeOut(castFrame, 0.3),
-        J:Stop(),
-        }),
-    })
 end
