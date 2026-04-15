@@ -1,15 +1,18 @@
--- jKwery: Smooth, declarative animation library for WoW 1.12
+-- PizzaSauce: Smooth, declarative animation library for WoW 1.12
+
+local _G = getfenv(0)
 
 local lib = {}
-lib._version = "0.0.6"
-local _G = getfenv(0) -- needed to add for default vanilla wow, no other issues yet
-_G["jKwery"] = lib
+lib.version = "0.1.0"
+_G["PizzaSauce"] = lib
 
 lib._types = {}
 lib._easing = {}
 lib._active = {}
 lib._pending = {}
+lib._pendingN = 0
 lib._count = 0
+lib._finBuf = {}
 
 lib._frame = CreateFrame("Frame", nil, UIParent)
 lib._frame:Hide()
@@ -45,11 +48,13 @@ lib._frame:SetScript("OnUpdate", function()
   if dt <= 0 then return end
 
   -- Process pending auto-play animations
-  local pending = lib._pending
-  lib._pending = {}
-  for i = 1, table.getn(pending) do
-    if pending[i]._autoplay then
-      pending[i]:Play()
+  local pendingN = lib._pendingN
+  if pendingN > 0 then
+    lib._pendingN = 0
+    for i = 1, pendingN do
+      local anim = lib._pending[i]
+      lib._pending[i] = nil
+      if anim._autoplay then anim:Play() end
     end
   end
 
@@ -59,19 +64,20 @@ lib._frame:SetScript("OnUpdate", function()
     return
   end
 
-  -- Tick all active animations
-  local finished = nil
+  -- Tick all active, collect finished into scratch buffer.
+  -- Can't finish inline because _finish() callbacks may create new animations,
+  -- which would modify _active while we're iterating it.
+  local finN = 0
   for anim in pairs(lib._active) do
     if anim:_tick(dt, now) then
-      finished = finished or {}
-      table.insert(finished, anim)
+      finN = finN + 1
+      lib._finBuf[finN] = anim
     end
   end
 
-  if finished then
-    for i = 1, table.getn(finished) do
-      finished[i]:_finish()
-    end
+  for i = 1, finN do
+    lib._finBuf[i]:_finish()
+    lib._finBuf[i] = nil
   end
 end)
 
@@ -80,7 +86,8 @@ lib._deactivate = deactivate
 
 function lib._schedulePending(anim)
   anim._autoplay = true
-  table.insert(lib._pending, anim)
+  lib._pendingN = lib._pendingN + 1
+  lib._pending[lib._pendingN] = anim
   lastTime = GetTime()
   lib._frame:Show()
 end
@@ -93,7 +100,12 @@ function lib:RegisterEasing(name, fn)
   lib._easing[name] = fn
 end
 
-function lib:RegisterAnimation(name, fn)
+function lib:RegisterHelper(name, fn)
+  if lib[name] then
+    DEFAULT_CHAT_FRAME:AddMessage(
+      "PizzaSauce: RegisterHelper('" .. name .. "') would overwrite an existing method")
+    return
+  end
   lib[name] = fn
 end
 local E = lib._easing
@@ -225,25 +237,17 @@ E["inOutBounce"] = function(t)
 end
 local function lerp(a, b, t) return a + (b - a) * t end
 
-local function lerpTable(from, to, t)
-  local r = {}
-  for i = 1, table.getn(from) do
-    r[i] = lerp(from[i] or 0, to[i] or 0, t)
-  end
-  return r
+local function rotCorner(a)
+  local r = math.rad(a)
+  return 0.5 + math.cos(r) / 1.4142, 0.5 + math.sin(r) / 1.4142
 end
 
--- Rotate a texture by remapping UV coordinates
 local function applyRotation(texture, angle)
-  local function corner(a)
-    local r = math.rad(a)
-    return 0.5 + math.cos(r) / 1.4142, 0.5 + math.sin(r) / 1.4142
-  end
   local a = -angle
-  local ULx, ULy = corner(a + 225)
-  local LLx, LLy = corner(a + 135)
-  local URx, URy = corner(a - 45)
-  local LRx, LRy = corner(a + 45)
+  local ULx, ULy = rotCorner(a + 225)
+  local LLx, LLy = rotCorner(a + 135)
+  local URx, URy = rotCorner(a - 45)
+  local LRx, LRy = rotCorner(a + 45)
   texture:SetTexCoord(ULx, ULy, LLx, LLy, URx, URy, LRx, LRy)
 end
 
@@ -274,9 +278,8 @@ lib:RegisterType("size", {
     return from or { target:GetWidth(), target:GetHeight() }
   end,
   apply = function(target, from, to, t)
-    local v = lerpTable(from, to, t)
-    target:SetWidth(v[1])
-    target:SetHeight(v[2])
+    target:SetWidth(lerp(from[1], to[1], t))
+    target:SetHeight(lerp(from[2], to[2], t))
   end,
 })
 
@@ -289,9 +292,9 @@ lib:RegisterType("position", {
     return from or { x or 0, y or 0 }
   end,
   apply = function(target, from, to, t, tween)
-    local v = lerpTable(from, to, t)
     target:ClearAllPoints()
-    target:SetPoint(tween._point, tween._rel, tween._relPoint, v[1], v[2])
+    target:SetPoint(tween._point, tween._rel, tween._relPoint,
+      lerp(from[1], to[1], t), lerp(from[2], to[2], t))
   end,
 })
 
@@ -300,8 +303,11 @@ lib:RegisterType("color", {
     return from or { 1, 1, 1, 1 }
   end,
   apply = function(target, from, to, t)
-    local v = lerpTable(from, to, t)
-    target:SetVertexColor(v[1], v[2], v[3], v[4] or 1)
+    target:SetVertexColor(
+      lerp(from[1], to[1], t),
+      lerp(from[2], to[2], t),
+      lerp(from[3], to[3], t),
+      lerp(from[4] or 1, to[4] or 1, t))
   end,
 })
 
@@ -328,7 +334,7 @@ lib:RegisterType("custom", {
 })
 local function resolveEasing(easing)
   if type(easing) == "function" then return easing end
-  return lib._easing[easing] or lib._easing["linear"]
+  return lib._easing[easing] or lib._easing["inOutQuad"]
 end
 
 local Tween = {}
@@ -385,6 +391,8 @@ function Tween:_finish()
   lib._deactivate(self)
   self._done = true
 
+  -- Apply one final time at exactly t=1 -- the last _tick may have landed
+  -- slightly before 1.0 depending on frame timing.
   local handler = lib._types[self._type]
   if handler and handler.apply and self._target then
     handler.apply(self._target, self._from, self._to, 1, self)
@@ -396,6 +404,12 @@ function Tween:_finish()
   if self._onFinish then self:_onFinish() end
 end
 
+function Tween:SetFrom(val) self._from = val end
+function Tween:SetTo(val) self._to = val end
+function Tween:SetDuration(val) self._duration = val end
+function Tween:SetDelay(val) self._delay = val end
+function Tween:SetTarget(val) self._target = val end
+
 function Tween:_reset()
   self._elapsed = 0
   self._started = false
@@ -403,6 +417,12 @@ function Tween:_reset()
 end
 
 local TweenMT = { __index = Tween }
+
+local KNOWN_OPTS = {
+  type = true, from = true, to = true, duration = true, easing = true,
+  delay = true, onStart = true, onUpdate = true, onFinish = true,
+  onCancel = true, getter = true, setter = true, defer = true,
+}
 
 function lib:Tween(target, opts)
   local tween = setmetatable({
@@ -419,8 +439,16 @@ function lib:Tween(target, opts)
     _onCancel = opts.onCancel,
     _getter   = opts.getter,
     _setter   = opts.setter,
-    _opts     = opts,
   }, TweenMT)
+
+  -- Forward extra opts to the tween for custom type handlers.
+  -- Internal fields use underscore prefix, so user params (vx, radius, etc.)
+  -- are accessible as tween.vx, tween.radius without collision.
+  for k, v in pairs(opts) do
+    if not KNOWN_OPTS[k] then
+      tween[k] = v
+    end
+  end
 
   if not opts.defer then
     lib._schedulePending(tween)
@@ -505,11 +533,11 @@ function Sequence:_handleLoop()
   end
 
   if self._yoyo then
-    local reversed = {}
-    for i = table.getn(self._children), 1, -1 do
-      table.insert(reversed, self._children[i])
+    local c = self._children
+    local n = table.getn(c)
+    for i = 1, math.floor(n / 2) do
+      c[i], c[n - i + 1] = c[n - i + 1], c[i]
     end
-    self._children = reversed
   end
 
   self._index = 1
@@ -548,6 +576,7 @@ end
 local Group = {}
 
 function Group:Play()
+  self._loopCount = 0
   self._elapsed = 0
   self._done = false
   self:_resetChildren()
@@ -589,7 +618,28 @@ function Group:_tick(dt)
     end
   end
 
-  return allDone
+  if allDone then
+    return self:_handleLoop()
+  end
+  return false
+end
+
+function Group:_handleLoop()
+  self._loopCount = self._loopCount + 1
+  if self._loop ~= 0 and self._loopCount >= self._loop then
+    return true
+  end
+
+  if self._yoyo then
+    local c = self._children
+    local n = table.getn(c)
+    for i = 1, math.floor(n / 2) do
+      c[i], c[n - i + 1] = c[n - i + 1], c[i]
+    end
+  end
+
+  self:_resetChildren()
+  return false
 end
 
 function Group:_finish()
@@ -603,6 +653,7 @@ function Group:_start()
 end
 
 function Group:_reset()
+  self._loopCount = 0
   self._elapsed = 0
   self._done = false
   self._started = false
@@ -625,12 +676,15 @@ function lib:Group(children, opts)
   end
 
   local grp = setmetatable({
-    _children = children,
-    _delay    = opts.delay or 0,
-    _elapsed  = 0,
-    _onFinish = opts.onFinish,
-    _onCancel = opts.onCancel,
-    _done     = false,
+    _children  = children,
+    _loop      = opts.loop or 1,
+    _yoyo      = opts.yoyo or false,
+    _loopCount = 0,
+    _delay     = opts.delay or 0,
+    _elapsed   = 0,
+    _onFinish  = opts.onFinish,
+    _onCancel  = opts.onCancel,
+    _done      = false,
   }, GroupMT)
 
   if not opts.defer then
@@ -657,9 +711,10 @@ local function getAnchorPos(frame)
   return { x or 0, y or 0 }
 end
 
+local EMPTY = {}
 local function opts(o)
   if type(o) == "table" then return o end
-  return {}
+  return EMPTY
 end
 
 -- ============================================================
@@ -671,7 +726,7 @@ function lib:FadeTo(target, toAlpha, duration, easing, o)
   return lib:Tween(target, {
     type = "alpha", to = toAlpha,
     duration = duration, easing = easing,
-    delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
   })
 end
 
@@ -680,7 +735,11 @@ function lib:FadeIn(target, duration, easing, o)
   return lib:Tween(target, {
     type = "alpha", from = 0, to = 1,
     duration = duration, easing = easing,
-    onStart = function() target:SetAlpha(0); target:Show() end,
+    onStart = function()
+      target:SetAlpha(0)
+      target:Show()
+      if o.onStart then o.onStart() end
+    end,
     delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
   })
 end
@@ -726,7 +785,10 @@ function lib:ScaleIn(target, duration, easing, o)
   return lib:Tween(target, {
     type = "scale", from = 0, to = 1,
     duration = duration or 0.3, easing = easing or "outBack",
-    onStart = function() target:Show() end,
+    onStart = function()
+      target:Show()
+      if o.onStart then o.onStart() end
+    end,
     delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
   })
 end
@@ -737,6 +799,7 @@ function lib:ScaleOut(target, duration, easing, o)
   return lib:Tween(target, {
     type = "scale", from = 1, to = 0,
     duration = duration or 0.3, easing = easing or "inBack",
+    onStart = o.onStart,
     onFinish = function() target:Hide(); if onFinish then onFinish() end end,
     onCancel = o.onCancel, delay = o.delay, defer = o.defer,
   })
@@ -762,7 +825,7 @@ function lib:Rubber(target, scale, duration, o)
   return lib:Tween(target, {
     type = "scale", from = scale or 1.3, to = 1.0,
     duration = duration or 0.5, easing = "outElastic",
-    delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
   })
 end
 
@@ -821,12 +884,21 @@ end
 -- Position
 -- ============================================================
 
-function lib:SlideTo(target, toX, toY, duration, easing, o)
+function lib:Move(target, from, to, duration, easing, o)
   o = opts(o)
   return lib:Tween(target, {
-    type = "position", to = { toX, toY },
+    type = "position", from = from, to = to,
+    duration = duration or 0.3, easing = easing,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+  })
+end
+
+function lib:MoveTo(target, to, duration, easing, o)
+  o = opts(o)
+  return lib:Tween(target, {
+    type = "position", to = to,
     duration = duration, easing = easing,
-    delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
   })
 end
 
@@ -834,13 +906,25 @@ function lib:SlideIn(target, direction, distance, duration, easing, o)
   o = opts(o)
   local dest = getAnchorPos(target)
   local offset = dirOffset(direction, distance or 100)
-  local from = { dest[1] + offset[1], dest[2] + offset[2] }
+  local from = { dest[1] - offset[1], dest[2] - offset[2] }
   return lib:Group({
     lib:Tween(target, {
       type = "position", from = from, to = dest, duration = duration or 0.3, easing = easing or "outCubic",
-      onStart = function() target:SetAlpha(0); target:Show() end, defer = true,
+      onStart = function()
+        target:SetAlpha(0)
+        target:Show()
+        if o.onStart then o.onStart() end
+      end,
+      defer = true,
     }),
-    lib:Tween(target, { type = "alpha", from = 0, to = 1, duration = (duration or 0.3) * 0.6, easing = "outQuad", defer = true }),
+    lib:Tween(target, {
+      type = "alpha",
+      from = 0,
+      to = 1,
+      duration = (duration or 0.3) * 0.6,
+      easing = "outQuad",
+      defer = true,
+    }),
   }, { delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer })
 end
 
@@ -912,7 +996,7 @@ function lib:FlyTo(frame, targetFrame, duration, easing, o)
   return lib:Tween(frame, {
     type = "position", to = { toX, toY },
     duration = duration or 0.5, easing = easing or "inOutQuad",
-    delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
   })
 end
 
@@ -925,9 +1009,12 @@ function lib:Spin(texture, degreesPerSecond, o)
   local dps = degreesPerSecond or 90
   return lib:Sequence({
     lib:Tween(texture, {
-      type = "rotation", from = 0, to = 360,
+      type = "rotation",
+      from = 0,
+      to = dps > 0 and 360 or -360,
       duration = 360 / math.abs(dps),
-      easing = "linear", defer = true,
+      easing = "linear",
+      defer = true,
     }),
   }, { loop = 0, delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer })
 end
@@ -935,6 +1022,15 @@ end
 -- ============================================================
 -- Color
 -- ============================================================
+
+function lib:Color(target, from, to, duration, easing, o)
+  o = opts(o)
+  return lib:Tween(target, {
+    type = "color", from = from, to = to,
+    duration = duration or 0.3, easing = easing,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+  })
+end
 
 function lib:ColorFlash(texture, r, g, b, duration, o)
   o = opts(o)
@@ -950,12 +1046,21 @@ end
 -- Size
 -- ============================================================
 
-function lib:Morph(target, toW, toH, duration, easing, o)
+function lib:Size(target, from, to, duration, easing, o)
   o = opts(o)
   return lib:Tween(target, {
-    type = "size", to = { toW, toH },
+    type = "size", from = from, to = to,
     duration = duration or 0.3, easing = easing,
-    delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+  })
+end
+
+function lib:Morph(target, to, duration, easing, o)
+  o = opts(o)
+  return lib:Tween(target, {
+    type = "size", to = to,
+    duration = duration or 0.3, easing = easing,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
   })
 end
 
@@ -972,7 +1077,7 @@ function lib:Progress(statusbar, toValue, duration, easing, o)
     easing = easing or "outCubic",
     getter = function(bar) return bar:GetValue() end,
     setter = function(bar, val) bar:SetValue(val) end,
-    delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
   })
 end
 
@@ -991,7 +1096,7 @@ function lib:Typewriter(fontstring, text, duration, o)
     setter = function(fs, val)
       fs:SetText(string.sub(text, 1, math.floor(val)))
     end,
-    delay = o.delay, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
   })
 end
 
@@ -1014,10 +1119,10 @@ local function clipTween(target, direction, duration, easing, from, to, o)
   duration = duration or 0.3
 
   local parent = target:GetParent()
-  local baseW = target._jkClipBaseW or parent:GetWidth()
-  local baseH = target._jkClipBaseH or parent:GetHeight()
-  target._jkClipBaseW = baseW
-  target._jkClipBaseH = baseH
+  local baseW = target._clipBaseW or parent:GetWidth()
+  local baseH = target._clipBaseH or parent:GetHeight()
+  target._clipBaseW = baseW
+  target._clipBaseH = baseH
 
   local horizontal = (direction == "LEFT" or direction == "RIGHT")
   local reversed = (direction == "RIGHT" or direction == "UP")
@@ -1076,7 +1181,7 @@ end
 -- Unlike Reveal/Conceal where the image is stationary and a window opens,
 -- here the image physically moves into view (like sliding out from under a cover).
 -- WipeIn/WipeOut: the image slides into/out of view while being clipped.
--- The texture stays full-size (no stretching) — we clip by shrinking the
+-- The texture stays full-size (no stretching) -- we clip by shrinking the
 -- visible region and offsetting tex coords so the revealed portion matches
 -- the correct part of the image.
 --
@@ -1096,10 +1201,10 @@ local function wipeTween(target, direction, duration, easing, from, to, o)
   duration = duration or 0.3
 
   local parent = target:GetParent()
-  local baseW = target._jkClipBaseW or parent:GetWidth()
-  local baseH = target._jkClipBaseH or parent:GetHeight()
-  target._jkClipBaseW = baseW
-  target._jkClipBaseH = baseH
+  local baseW = target._clipBaseW or parent:GetWidth()
+  local baseH = target._clipBaseH or parent:GetHeight()
+  target._clipBaseW = baseW
+  target._clipBaseH = baseH
 
   local horizontal = (direction == "LEFT" or direction == "RIGHT")
   local anchor = wipeAnchors[direction]
@@ -1139,9 +1244,12 @@ local function wipeTween(target, direction, duration, easing, from, to, o)
   })
 end
 
+local wipeInFlip = { LEFT="RIGHT", RIGHT="LEFT", UP="DOWN", DOWN="UP" }
+
 function lib:WipeIn(target, direction, duration, easing, o)
   target:Show()
-  return wipeTween(target, direction, duration, easing, 0, 1, o)
+  local dir = wipeInFlip[string.upper(direction or "LEFT")] or direction
+  return wipeTween(target, dir, duration, easing, 0, 1, o)
 end
 
 function lib:WipeOut(target, direction, duration, easing, o)
@@ -1185,24 +1293,32 @@ function lib:Delay(duration)
   })
 end
 
+function lib:Run(fn, o)
+  o = opts(o)
+  return lib:Tween(nil, {
+    type = "custom", from = 0, to = 0, duration = 0,
+    onStart = fn, delay = o.delay, defer = o.defer,
+  })
+end
+
 function lib:Stop(target)
   for anim in pairs(lib._active) do
     if anim._target == target then
       anim:Cancel()
     elseif anim._children then
-      lib:_stopInChildren(anim, target)
+      lib:_stopInChildren(anim, anim, target)
     end
   end
   -- Also cancel pending (not yet started) animations for this target
-  for i = table.getn(lib._pending), 1, -1 do
+  for i = 1, lib._pendingN do
     local anim = lib._pending[i]
-    if anim._target == target then
-      anim._autoplay = false
-      table.remove(lib._pending, i)
-    elseif anim._children then
-      if lib:_hasTargetInChildren(anim, target) then
+    if anim then
+      if anim._target == target then
         anim._autoplay = false
-        table.remove(lib._pending, i)
+      elseif anim._children then
+        if lib:_hasTargetInChildren(anim, target) then
+          anim._autoplay = false
+        end
       end
     end
   end
@@ -1217,14 +1333,15 @@ function lib:_hasTargetInChildren(parent, target)
   return false
 end
 
-function lib:_stopInChildren(parent, target)
+function lib:_stopInChildren(root, parent, target)
   for i = 1, table.getn(parent._children) do
     local child = parent._children[i]
     if child._target == target then
-      parent:Cancel()
+      root:Cancel()
       return
     elseif child._children then
-      lib:_stopInChildren(child, target)
+      lib:_stopInChildren(root, child, target)
+      if not root._active then return end
     end
   end
 end

@@ -1,5 +1,5 @@
-local J = jKwery
-local JKT = jKweryTest
+local J = PizzaSauce
+--local JKT = jKweryTest
 
 -- =============================================================================
 -- "ballistic" type: Physics-based projectile trajectory
@@ -34,8 +34,6 @@ local JKT = jKweryTest
 
 J:RegisterType("ballistic", {
   init = function(target, from, to, tween)
-    -- Capture the frame's current anchor so we can reposition it each frame.
-    -- We store these on the tween itself so they persist across frames.
     local point, rel, relPoint, x, y = target:GetPoint(1)
     tween._point = point or "CENTER"
     tween._rel = rel
@@ -43,20 +41,16 @@ J:RegisterType("ballistic", {
     return from or { x or 0, y or 0 }
   end,
   apply = function(target, from, to, t, tween)
-    -- t is the eased progress (0-1). Since easing is "linear", t maps
-    -- directly to elapsed time as a fraction of total duration.
     local elapsed = t * tween._duration
-    local o = tween._opts
-    local x = from[1] + o.vx * elapsed
-    local y = from[2] + o.vy * elapsed - 0.5 * o.gravity * elapsed * elapsed
+    local x = from[1] + tween.vx * elapsed
+    local y = from[2] + tween.vy * elapsed - 0.5 * tween.gravity * elapsed * elapsed
     target:ClearAllPoints()
     target:SetPoint(tween._point, tween._rel, tween._relPoint, x, y)
   end,
 })
 
--- Convenience function: J:Ballistic(target, from, duration, vx, vy, gravity, opts)
 -- Forces linear easing since the physics math expects raw elapsed time.
-J:RegisterAnimation("Ballistic", function(self, target, from, duration, vx, vy, gravity, o)
+J:RegisterHelper("Ballistic", function(self, target, from, duration, vx, vy, gravity, o)
   o = o or {}
   return self:Tween(target, {
     type = "ballistic", from = from, duration = duration, easing = "linear",
@@ -64,29 +58,40 @@ J:RegisterAnimation("Ballistic", function(self, target, from, duration, vx, vy, 
     delay = o.delay, onStart = o.onStart, onFinish = o.onFinish,
     onCancel = o.onCancel, defer = o.defer,
   })
-end) 
+end)
 
 ---- ** Blackhole ** ----
 -- init -- 
 -- Register the spiral type (global, persists for addon lifetime)
 J:RegisterType("spiral", {
-    init = function(target, from, to, tween)
-        local point, rel, relPoint, x, y = target:GetPoint(1)
-        tween._point = point or "CENTER"
-        tween._rel = rel
-        tween._relPoint = relPoint or "CENTER"
-        return from or 0
-    end,
-    apply = function(target, from, to, t, tween)
-        local o = tween._opts
-        local r = o.radius * (1 - t)
-        local angle = o.startAngle + o.rotations * 2 * math.pi * t
-        local x = o.cx + math.cos(angle) * r
-        local y = o.cy + math.sin(angle) * r
-        target:ClearAllPoints()
-        target:SetPoint(tween._point, tween._rel, tween._relPoint, x, y)
-    end,
+  init = function(target, from, to, tween)
+    local point, rel, relPoint, x, y = target:GetPoint(1)
+    tween._point = point or "CENTER"
+    tween._rel = rel
+    tween._relPoint = relPoint or "CENTER"
+    return from or 0
+  end,
+  apply = function(target, from, to, t, tween)
+    local r = tween.radius * (1 - t)
+    local angle = tween.startAngle + tween.rotations * 2 * math.pi * t
+    local x = tween.cx + math.cos(angle) * r
+    local y = tween.cy + math.sin(angle) * r
+    target:ClearAllPoints()
+    target:SetPoint(tween._point, tween._rel, tween._relPoint, x, y)
+  end,
 })
+
+J:RegisterHelper("Spiral", function(self, target, duration, cx, cy, radius, startAngle, rotations, easing, o)
+  if type(easing) == "table" then o = easing; easing = nil end
+  o = o or {}
+  return self:Tween(target, {
+    type = "spiral", from = 0, to = 1,
+    duration = duration, easing = easing,
+    cx = cx, cy = cy, radius = radius,
+    startAngle = startAngle, rotations = rotations,
+    delay = o.delay, onStart = o.onStart, onFinish = o.onFinish, onCancel = o.onCancel, defer = o.defer,
+  })
+end)
 
 local NUM_PARTICLES = 60
 local CENTER_X, CENTER_Y = 0, 100

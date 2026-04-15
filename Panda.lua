@@ -21,7 +21,7 @@ local libIcon = LibStub("LibDBIcon-1.0");
 local libData = LibStub("LibDataBroker-1.1");
 local PA_Dewdrop = AceLibrary("Dewdrop-2.0");
 local ClickedDEButton = 0;
-local J = jKwery
+local J = PizzaSauce
 
 --Event handler/init
 function PandaBorder_OnEvent()
